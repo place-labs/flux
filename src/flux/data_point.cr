@@ -1,3 +1,5 @@
+require "./line_protocol"
+
 # Model for InfluxDB data points.
 struct Flux::DataPoint
   alias TagSet = Hash(Symbol, String | Symbol)
@@ -30,5 +32,9 @@ struct Flux::DataPoint
   # Checks if any tags are defined for the point.
   def tagged?
     !@tags.nil?
+  end
+
+  def to_s(io)
+    LineProtocol.serialize self, io
   end
 end
