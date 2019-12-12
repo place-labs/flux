@@ -12,6 +12,7 @@ struct Flux::DataPoint
 
   getter timestamp : Time
 
+  # Creates a new data point that can be serialized for entry to InfluxDB.
   def initialize(@measurement, @timestamp = Time.now, @tags = nil, **fields : **T) forall T
     raise ArgumentError.new "data points must include at least one field" \
       if fields.empty?
@@ -22,10 +23,13 @@ struct Flux::DataPoint
     {% end %}
   end
 
+  # Append or change a tag on the point.
   def tag(key, value)
     tags[key] = value
   end
 
+  # Serializes the point to InfluxDB line protocol.
+  # See https://v2.docs.influxdata.com/v2.0/reference/syntax/line-protocol/
   def to_s(io : IO)
     io << @measurement
 
