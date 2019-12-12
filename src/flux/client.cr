@@ -40,7 +40,7 @@ class Flux::Client
     end
   end
 
-  def query()
+  def query
     raise NotImplementedError.new
   end
 end
