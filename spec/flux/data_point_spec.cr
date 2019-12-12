@@ -33,7 +33,7 @@ describe Flux::DataPoint do
       ts = time.to_unix
       point = Flux::DataPoint.new "foo", time, a: 1
       point.tag :test, "bar"
-      point.to_s.should eq("foo,test=bar a=1 #{ts}\n")
+      point.to_s.should eq("foo,test=bar a=1 #{ts}")
     end
   end
 end

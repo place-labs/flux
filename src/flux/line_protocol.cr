@@ -39,8 +39,6 @@ module Flux::LineProtocol
     io << ' '
 
     io << point.timestamp.to_unix
-
-    io << '\n'
   end
 
   # Serializes *point* to a line protocol row.
