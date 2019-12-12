@@ -1,4 +1,4 @@
-# Model and serialization tools for InfluxDB data points.
+# Model for InfluxDB data points.
 struct Flux::DataPoint
   alias TagSet = Hash(Symbol, String | Symbol)
 
@@ -28,41 +28,8 @@ struct Flux::DataPoint
     tags[key] = value
   end
 
-  # Serializes the point to InfluxDB line protocol.
-  # See https://v2.docs.influxdata.com/v2.0/reference/syntax/line-protocol/
-  def to_s(io : IO)
-    io << @measurement
-
-    @tags.try(
-      &.each do |k, v|
-        io << ','
-        io << k
-        io << '='
-        io << v
-      end
-    )
-
-    io << ' '
-
-    fields.join(',', io) do |(k, v), field|
-      field << k
-      field << '='
-      case v
-      when String
-        field << '"'
-        field << v
-        field << '"'
-      when true
-        field << 't'
-      when false
-        field << 'f'
-      else
-        field << v
-      end
-    end
-
-    io << ' '
-
-    io << timestamp.to_unix
+  # Checks if any tags are defined for the point.
+  def tagged?
+    !@tags.nil?
   end
 end
