@@ -2,7 +2,7 @@ require "../spec_helper"
 
 describe Flux::LineProtocol do
   describe ".serialize" do
-    time = Time.now
+    time = Time.utc
     ts = time.to_unix
 
     it "serializes a simple point to line protocol" do

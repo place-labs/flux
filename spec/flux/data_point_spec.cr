@@ -29,7 +29,7 @@ describe Flux::DataPoint do
 
   describe "to_s" do
     it "serializes to line procotol" do
-      time = Time.now
+      time = Time.utc
       ts = time.to_unix
       point = Flux::DataPoint.new "foo", time, a: 1
       point.tag :test, "bar"
