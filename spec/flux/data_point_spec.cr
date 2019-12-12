@@ -14,7 +14,7 @@ describe Flux::DataPoint do
         :a => 1,
         :b => "test",
         :c => 0.0,
-        :d => false
+        :d => false,
       })
     end
   end

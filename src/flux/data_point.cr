@@ -14,8 +14,7 @@ struct Flux::DataPoint
 
   # Creates a new data point that can be serialized for entry to InfluxDB.
   def initialize(@measurement, @timestamp = Time.now, @tags = nil, **fields : **T) forall T
-    raise ArgumentError.new "data points must include at least one field" \
-      if fields.empty?
+    raise ArgumentError.new "points must include at least one field" if fields.empty?
 
     @fields = FieldSet.new
     {% for k in T %}
