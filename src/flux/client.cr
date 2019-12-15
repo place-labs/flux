@@ -3,8 +3,6 @@ require "uri"
 require "./data_point"
 
 class Flux::Client
-  BASE_PATH = "/api/v2"
-
   private getter connection : HTTP::Client
 
   delegate :connect_timeout=, :read_timeout=, to: connection
@@ -14,7 +12,7 @@ class Flux::Client
 
     connection.before_request do |req|
       req.headers["Authorization"] = "Token #{token}"
-      req.path = "#{BASE_PATH}#{req.path}"
+      req.path = "/api/v2#{req.path}"
       req.query_params["org"] = org
     end
   end
