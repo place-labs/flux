@@ -5,7 +5,7 @@ describe InfluxDB::Client do
 
   points = [] of InfluxDB::Point
   100.times do
-    points << InfluxDB::Point.new "name", a: Random.rand
+    points << InfluxDB::Point["name", a: Random.rand]
   end
 
   describe "#write" do
