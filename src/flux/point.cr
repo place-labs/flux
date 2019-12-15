@@ -1,7 +1,7 @@
 require "./line_protocol"
 
 # Model for InfluxDB data points.
-struct Flux::DataPoint
+struct Flux::Point
   alias TagSet = Hash(Symbol, String | Symbol)
 
   alias FieldSet = Hash(Symbol, Float32 | Float64 | Int32 | Int64 | Bool | String)

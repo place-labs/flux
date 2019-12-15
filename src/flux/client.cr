@@ -1,6 +1,6 @@
 require "http/client"
 require "uri"
-require "./data_point"
+require "./point"
 
 class Flux::Client
   private getter connection : HTTP::Client
@@ -18,14 +18,14 @@ class Flux::Client
   end
 
   # Writes a single *point* to the passed *bucket*.
-  def write(bucket : String, point : DataPoint)
+  def write(bucket : String, point : Point)
     # OPTIMIZE: cache single point requests and right after reaching threshold
     # or max hold time.
     write bucket, {point}
   end
 
   # Writes a set of *points* to the passed *bucket*.
-  def write(bucket : String, points : Enumerable(DataPoint)) : Nil
+  def write(bucket : String, points : Enumerable(Point)) : Nil
     params = HTTP::Params.build do |param|
       param.add "bucket", bucket
       param.add "precision", "s"
