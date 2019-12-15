@@ -1,9 +1,9 @@
 require "./point"
 
-# Tools for InfluxDB line protocol marshalling.
+# Tools for line protocol marshalling.
 # See https://v2.docs.influxdata.com/v2.0/reference/syntax/line-protocol/
 # TODO: escape special chars
-module Flux::LineProtocol
+module InfluxDB::LineProtocol
   # Appends *point* onto *io* in line protocol format.
   def self.serialize(point : Point, io : IO) : Nil
     io << point.measurement

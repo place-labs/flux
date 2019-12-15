@@ -2,13 +2,13 @@ require "http/client"
 require "uri"
 require "./point"
 
-class Flux::Client
+class InfluxDB::Client
   private getter connection : HTTP::Client
 
   delegate :connect_timeout=, :read_timeout=, to: connection
 
-  def initialize(host, org : String, token : String)
-    @connection = HTTP::Client.new host
+  def initialize(url, token : String, org : String)
+    @connection = HTTP::Client.new url
 
     connection.before_request do |req|
       req.headers["Authorization"] = "Token #{token}"
@@ -33,12 +33,27 @@ class Flux::Client
 
     response = connection.post "/write?#{params}", body: points.join '\n'
 
+    # TODO parse responses into domain specific errors
     unless response.success?
-      raise "Error writing data points (HTTP #{response.status})"
+      raise "Error writing data points (HTTP #{response.status_code})"
     end
   end
 
-  def query
-    raise NotImplementedError.new
+  # Runs a query on the connected InfluxDB instance.
+  #
+  # *expression* must be a valid Flux expression.
+  def query(expression : String)
+    headers = HTTP::Headers.new
+    headers.add "Accept", "application/csv"
+    headers.add "Content-type", "application/vnd.flux"
+
+    response = connection.post "/query", headers, body
+
+    # TODO parse responses into domain specific errors
+    unless response.success?
+      raise "Error writing data points (HTTP #{response.status_code})"
+    end
+
+    response.body_io
   end
 end
