@@ -7,6 +7,12 @@ class InfluxDB::Client
 
   delegate :connect_timeout=, :read_timeout=, to: connection
 
+  # Creates a new InfluxDB client for the instance running at the specified
+  # *url*.
+  #
+  # *token* must be a valid API token on the instance that provides sufficient
+  # privaleges for the buckets being interact with. Similarly *org* must match
+  # the appropriate *org* name these buckets sit under.
   def initialize(url, token : String, org : String)
     @connection = HTTP::Client.new url
 
@@ -21,17 +27,43 @@ class InfluxDB::Client
   def write(bucket : String, point : Point)
     # OPTIMIZE: cache single point requests and right after reaching threshold
     # or max hold time.
-    write bucket, {point}
+    write_internal bucket do |io|
+      io << point
+    end
   end
 
   # Writes a set of *points* to the passed *bucket*.
   def write(bucket : String, points : Enumerable(Point)) : Nil
+    write_internal bucket do |io|
+      points.join '\n', io
+    end
+  end
+
+  # Write a set of data points to *bucket* on the connected instance.
+  #
+  # Yields an IO. Points to be written should be appended to this.
+  private def write_internal(bucket : String, &block : IO -> _)
+    buf = IO::Memory.new
+    yield buf
+    write_internal bucket, buf
+  end
+
+  # Write a set of data points to *bucket* on the connected instance.
+  private def write_internal(bucket : String, data : IO)
     params = HTTP::Params.build do |param|
       param.add "bucket", bucket
       param.add "precision", "s"
     end
 
-    response = connection.post "/write?#{params}", body: points.join '\n'
+    # FIXME: when passing the IO directly this does not ever appear to be
+    # written as part of the request. Unsure if this is due to an
+    # incompatability in the WebMock framework, or an issue elsewhere. The temp
+    # string conversion works, however is not ideal as this goes onto be wrapped
+    # by an IO::Memory straight away.
+    # request = HTTP::Request.new "POST", "/write?#{params}", body: data
+    # request.content_length = data.size
+    # response = connection.exec request
+    response = connection.post "/write?#{params}", body: data.to_s
 
     # TODO parse responses into domain specific errors
     unless response.success?
