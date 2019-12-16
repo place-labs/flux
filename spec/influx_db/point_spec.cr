@@ -29,7 +29,7 @@ describe InfluxDB::Point do
   describe "#tag" do
     it "allows tagging of points" do
       point = InfluxDB::Point["foo", a: 1]
-      point.tag :test, "bar"
+      point.tag test: "bar"
       point.tags.should eq({:test => "bar"})
     end
   end
@@ -39,7 +39,7 @@ describe InfluxDB::Point do
       time = Time.utc
       ts = time.to_unix
       point = InfluxDB::Point.new "foo", time, a: 1
-      point.tag :test, "bar"
+      point.tag test: "bar"
       point.to_s.should eq("foo,test=bar a=1 #{ts}")
     end
   end

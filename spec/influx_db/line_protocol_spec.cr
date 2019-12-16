@@ -17,7 +17,7 @@ describe InfluxDB::LineProtocol do
 
     it "serializes when tags are present" do
       point = InfluxDB::Point.new "foo", time, a: 1
-      point.tag :test, "bar"
+      point.tag test: "bar"
       InfluxDB::LineProtocol.serialize(point).should eq("foo,test=bar a=1 #{ts}")
     end
   end

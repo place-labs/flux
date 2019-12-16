@@ -28,9 +28,11 @@ struct InfluxDB::Point
     {% end %}
   end
 
-  # Append or change a tag on the point.
-  def tag(key, value)
-    tags[key] = value
+  # Append or change tags associated with the point.
+  def tag(**t : **T) forall T
+    {% for k in T %}
+      tags[{{k.symbolize}}] = t[{{k.symbolize}}]
+    {% end %}
   end
 
   # Checks if any tags are defined for the point.
