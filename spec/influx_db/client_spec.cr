@@ -1,7 +1,7 @@
 require "../spec_helper"
 
 describe InfluxDB::Client do
-  client = InfluxDB::Client.new "example.com", org: "foo", token: "abc"
+  client = InfluxDB::Client.new "http://example.com", org: "foo", token: "abc"
 
   points = [] of InfluxDB::Point
   100.times do

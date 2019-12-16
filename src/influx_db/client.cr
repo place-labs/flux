@@ -13,8 +13,9 @@ class InfluxDB::Client
   # *token* must be a valid API token on the instance that provides sufficient
   # privaleges for the buckets being interact with. Similarly *org* must match
   # the appropriate *org* name these buckets sit under.
-  def initialize(url, token : String, org : String)
-    @connection = HTTP::Client.new url
+  def initialize(host, token : String, org : String)
+    uri = URI.parse host
+    @connection = HTTP::Client.new uri
 
     connection.before_request do |req|
       req.headers["Authorization"] = "Token #{token}"
