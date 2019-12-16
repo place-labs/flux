@@ -45,25 +45,21 @@ class InfluxDB::Client
   private def write_internal(bucket : String, &block : IO -> _)
     buf = IO::Memory.new
     yield buf
+    buf.rewind
     write_internal bucket, buf
   end
 
   # Write a set of data points to *bucket* on the connected instance.
+  # TODO: check influx support for chunked transfer encoding
   private def write_internal(bucket : String, data : IO)
     params = HTTP::Params.build do |param|
       param.add "bucket", bucket
       param.add "precision", "s"
     end
 
-    # FIXME: when passing the IO directly this does not ever appear to be
-    # written as part of the request. Unsure if this is due to an
-    # incompatability in the WebMock framework, or an issue elsewhere. The temp
-    # string conversion works, however is not ideal as this goes onto be wrapped
-    # by an IO::Memory straight away.
-    # request = HTTP::Request.new "POST", "/write?#{params}", body: data
-    # request.content_length = data.size
-    # response = connection.exec request
-    response = connection.post "/write?#{params}", body: data.to_s
+    request = HTTP::Request.new "POST", "/write?#{params}", body: data
+    request.content_length = data.size
+    response = connection.exec request
 
     # TODO parse responses into domain specific errors
     unless response.success?
