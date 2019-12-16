@@ -24,16 +24,18 @@ class InfluxDB::Client
     end
   end
 
-  # Writes a single *point* to the passed *bucket*.
-  def write(bucket : String, point : Point)
-    # OPTIMIZE: cache single point requests and right after reaching threshold
-    # or max hold time.
+  # Perform a synchronous write of a single *point* to the passed *bucket*.
+  #
+  # In most cases this _should not_ be used due the associated request overhead.
+  # When writing points intermittently a `Writer` can be used to provide
+  # buffering and batching.
+  def write(bucket : String, point : Point) : Nil
     write_internal bucket do |io|
       io << point
     end
   end
 
-  # Writes a set of *points* to the passed *bucket*.
+  # Perform a synchronous write of a set of *points* to the passed *bucket*.
   def write(bucket : String, points : Enumerable(Point)) : Nil
     write_internal bucket do |io|
       points.join '\n', io
@@ -80,7 +82,7 @@ class InfluxDB::Client
 
     # TODO parse responses into domain specific errors
     unless response.success?
-      raise "Error writing data points (HTTP #{response.status_code})"
+      raise "Error running query (HTTP #{response.status_code})"
     end
 
     response.body_io

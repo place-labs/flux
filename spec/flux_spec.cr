@@ -10,36 +10,61 @@ describe Flux do
   end
 
   describe ".write" do
-    point = InfluxDB::Point["name", a: Random.rand]
+    points = [] of InfluxDB::Point
+    7.times do |idx|
+      points << InfluxDB::Point["name", a: Random.rand, idx: idx]
+    end
 
-    it "raises an exception when not configured" do
-      expect_raises(Exception) do
-        Flux.write point
+    context "when not configured" do
+      it "raises an exception" do
+        expect_raises(Exception) do
+          Flux.write points.first
+        end
       end
     end
 
-    it "writes single points" do
-      Flux.configure do |settings|
-        settings.host = "http://example.com"
-        settings.api_key = "abc"
-        settings.org = "foo"
-        settings.bucket = "test"
+    context "following global config" do
+      it "writes single points" do
+        Flux.configure do |settings|
+          settings.host = "http://example.com"
+          settings.api_key = "abc"
+          settings.org = "foo"
+          settings.bucket = "test"
+          settings.flush_delay = 50.milliseconds
+        end
+
+        WebMock.stub(:post, "http://example.com/api/v2/write")
+          .with(
+            headers: {
+              "Authorization" => "Token abc",
+            },
+            query: {
+              "bucket"    => "test",
+              "precision" => "s",
+              "org"       => "foo",
+            },
+            body: points.first.to_s
+          )
+        Flux.write points.first
+        sleep 0.1
       end
 
-      WebMock.stub(:post, "http://example.com/api/v2/write")
-        .with(
-          headers: {
-            "Authorization" => "Token abc",
-          },
-          query: {
-            "bucket"    => "test",
-            "precision" => "s",
-            "org"       => "foo",
-          },
-          body: point.to_s
-        )
-
-      Flux.write point
+      it "writes multiple points as a single request" do
+        WebMock.stub(:post, "http://example.com/api/v2/write")
+          .with(
+            headers: {
+              "Authorization" => "Token abc",
+            },
+            query: {
+              "bucket"    => "test",
+              "precision" => "s",
+              "org"       => "foo",
+            },
+            body: points.join '\n'
+          )
+        points.each &->Flux.write(InfluxDB::Point)
+        sleep 0.1
+      end
     end
   end
 end

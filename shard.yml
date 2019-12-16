@@ -8,6 +8,11 @@ crystal: 0.30.1
 
 license: MIT
 
+dependencies:
+  tasker:
+    github: spider-gazelle/tasker
+    branch: master
+
 development_dependencies:
   ameba:
     github: crystal-ameba/ameba
