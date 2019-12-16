@@ -36,9 +36,13 @@ module InfluxDB::LineProtocol
       end
     end
 
-    io << ' '
+    ts = point.timestamp
+    unless ts.nil?
+      io << ' '
+      io << ts.to_unix
+    end
 
-    io << point.timestamp.to_unix
+    io
   end
 
   # Serializes *point* to a line protocol row.

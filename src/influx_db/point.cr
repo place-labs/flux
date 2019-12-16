@@ -12,19 +12,21 @@ struct InfluxDB::Point
 
   getter fields : FieldSet
 
-  getter timestamp : Time
+  getter timestamp : Time?
 
-  def self.[](measurement, **fields)
-    new measurement, **fields
+  def self.[](measurement, timestamp = nil, **fields)
+    new measurement, timestamp, **fields
   end
 
   # Creates a new data point that can be serialized for entry to InfluxDB.
-  def initialize(@measurement, @timestamp = Time.local, @tags = nil, **fields : **T) forall T
+  def initialize(@measurement, @timestamp = nil, @tags = nil, **fields : **T) forall T
     raise ArgumentError.new "points must include at least one field" if fields.empty?
 
+    # FIXME refactor / neaten up when time allows
     @fields = FieldSet.new
     {% for k in T %}
-      @fields[{{k.symbolize}}] = fields[{{k.symbolize}}]
+      @fields[{{k.symbolize}}] = fields[{{k.symbolize}}].not_nil! \
+        unless fields[{{k.symbolize}}].nil?
     {% end %}
   end
 
