@@ -1,5 +1,5 @@
 require "./influx_db/*"
-require "./flux/*"
+# require "./flux/*"
 
 module Flux
   VERSION = `shards version`
