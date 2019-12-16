@@ -9,6 +9,8 @@ class InfluxDB::BufferedWriter
 
   private getter buffer : Channel(Point)
 
+  private getter writer : Channel(Array(Point))
+
   private getter batch_size : Int32
 
   private getter flush_delay : Time::Span
@@ -27,6 +29,13 @@ class InfluxDB::BufferedWriter
   # cached or no additional write call is made for *flush_delay*.
   def initialize(@client, @bucket, @batch_size = 5000, @flush_delay = 1.seconds)
     @buffer = Channel(Point).new(batch_size * 2)
+    @writer = Channel(Array(Point)).new
+    spawn do
+      loop do
+        points = writer.receive
+        client.write bucket, points
+      end
+    end
   end
 
   # Enqueue a *point* for writing.
@@ -41,13 +50,13 @@ class InfluxDB::BufferedWriter
     while queue_length >= batch_size
       @write_task.try &.cancel
       @write_task = nil
-      write batch_size
+      dequeue batch_size
     end
 
     if queue_length > 0
       @write_task ||= schedule.in(flush_delay) do
         @write_task = nil
-        write queue_length
+        dequeue queue_length
       end
     end
   end
@@ -63,14 +72,7 @@ class InfluxDB::BufferedWriter
       read
     end
     mutex.synchronize { @queue_length -= read }
+    writer.send points
     points
-  end
-
-  # Asynchronously writes up to *count* Points from the buffer.
-  def write(count : Int) : Nil
-    points = dequeue count
-    spawn do
-      client.write bucket, points
-    end
   end
 end
