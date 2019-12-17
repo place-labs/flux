@@ -33,7 +33,7 @@ class InfluxDB::BufferedWriter
     spawn do
       loop do
         points = writer.receive
-        client.write bucket, points
+        write points
       end
     end
   end
@@ -74,5 +74,22 @@ class InfluxDB::BufferedWriter
     mutex.synchronize { @queue_length -= read }
     writer.send points
     points
+  end
+
+  # Perform blocking write of a set of *points* via the wrapped client.
+  #
+  # Error will be retried as appropriate.
+  private def write(points : Enumerable(Point), retries = 3)
+    client.write bucket, points
+  rescue ex : TooManyRequests
+    puts "Too many requests. Retrying in #{ex.retry_after}"
+    sleep ex.retry_after
+    write points
+  rescue ex : ServerError
+    puts "Server error: #{ex}"
+    retries -= 1
+    write points, retries if retries > 0
+  rescue ex : Error
+    puts "Dropping request due to #{ex}"
   end
 end

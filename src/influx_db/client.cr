@@ -1,6 +1,7 @@
 require "http/client"
 require "uri"
 require "./point"
+require "./errors"
 
 class InfluxDB::Client
   private getter connection : HTTP::Client
@@ -54,20 +55,20 @@ class InfluxDB::Client
 
   # Write a set of data points to *bucket* on the connected instance.
   # TODO: check influx support for chunked transfer encoding
-  private def write_internal(bucket : String, data : IO)
+  private def write_internal(bucket : String, data : IO) : Nil
     params = HTTP::Params.build do |param|
       param.add "bucket", bucket
       param.add "precision", "s"
     end
 
+    puts "Writing #{data.size} bytes"
+
     request = HTTP::Request.new "POST", "/write?#{params}", body: data
     request.content_length = data.size
+
     response = connection.exec request
 
-    # TODO parse responses into domain specific errors
-    unless response.success?
-      raise "Error writing data points (HTTP #{response.status_code})"
-    end
+    InfluxDB.check_response response
   end
 
   # Runs a query on the connected InfluxDB instance.
@@ -80,10 +81,7 @@ class InfluxDB::Client
 
     response = connection.post "/query", headers, body
 
-    # TODO parse responses into domain specific errors
-    unless response.success?
-      raise "Error running query (HTTP #{response.status_code})"
-    end
+    InfluxDB.check_response response
 
     response.body_io
   end
