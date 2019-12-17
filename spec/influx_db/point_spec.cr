@@ -40,7 +40,7 @@ describe InfluxDB::Point do
       ts = time.to_unix
       point = InfluxDB::Point.new "foo", time, a: 1
       point.tag test: "bar"
-      point.to_s.should eq("foo,test=bar a=1 #{ts}")
+      point.to_s.should eq("foo,test=bar a=1i #{ts}")
     end
   end
 end

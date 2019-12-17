@@ -31,6 +31,12 @@ module InfluxDB::LineProtocol
         field << 't'
       when false
         field << 'f'
+      when Int::Signed
+        field << v
+        field << 'i'
+      when Int::Unsigned
+        field << v
+        field << 'u'
       else
         field << v
       end

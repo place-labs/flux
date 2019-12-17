@@ -4,7 +4,8 @@ require "./line_protocol"
 struct InfluxDB::Point
   alias TagSet = Hash(Symbol, String | Symbol)
 
-  alias FieldSet = Hash(Symbol, Float32 | Float64 | Int32 | Int64 | Bool | String)
+  alias FieldSet = Hash(Symbol, Float32 | Float64 | Int32 | Int64 | UInt32 |
+                        UInt64 | Bool | String)
 
   getter measurement : String
 

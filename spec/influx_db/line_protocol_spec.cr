@@ -7,24 +7,24 @@ describe InfluxDB::LineProtocol do
 
     it "serializes a simple point to line protocol" do
       point = InfluxDB::Point.new "foo", time, a: 1
-      InfluxDB::LineProtocol.serialize(point).should eq("foo a=1 #{ts}")
+      InfluxDB::LineProtocol.serialize(point).should eq("foo a=1i #{ts}")
     end
 
     it "serializes a multi-field point to line protocol" do
       point = InfluxDB::Point.new "foo", time, a: 1, b: true
-      InfluxDB::LineProtocol.serialize(point).should eq("foo a=1,b=t #{ts}")
+      InfluxDB::LineProtocol.serialize(point).should eq("foo a=1i,b=t #{ts}")
     end
 
     it "serializes when tags are present" do
       point = InfluxDB::Point.new "foo", time, a: 1
       point.tag test: "bar"
-      InfluxDB::LineProtocol.serialize(point).should eq("foo,test=bar a=1 #{ts}")
+      InfluxDB::LineProtocol.serialize(point).should eq("foo,test=bar a=1i #{ts}")
     end
 
     it "serializes without a timestamp (uses server rx time)" do
       point = InfluxDB::Point["foo", a: 1]
       point.tag test: "bar"
-      InfluxDB::LineProtocol.serialize(point).should eq("foo,test=bar a=1")
+      InfluxDB::LineProtocol.serialize(point).should eq("foo,test=bar a=1i")
     end
   end
 end
