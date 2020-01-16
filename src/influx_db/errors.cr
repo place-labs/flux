@@ -2,7 +2,6 @@ module InfluxDB
   def self.check_response(response)
     case response.status_code
     when 200..299
-      puts "Done"
       # All good
       nil
     when 429
