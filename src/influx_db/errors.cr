@@ -21,6 +21,7 @@ module InfluxDB
 
   class TooManyRequests < ClientError
     getter retry_after : Int32
+
     def initialize(msg = nil, @retry_after = 30)
       super msg
     end

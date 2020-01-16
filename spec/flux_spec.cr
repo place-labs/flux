@@ -4,7 +4,7 @@ describe Flux do
   describe ".configure" do
     it "raises an exception when passed an invalid config" do
       expect_raises(Exception) do
-        Flux.configure {}
+        Flux.configure { }
       end
     end
   end
