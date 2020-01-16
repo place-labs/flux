@@ -13,6 +13,16 @@ describe InfluxDB::Point do
     end
   end
 
+  describe ".new!" do
+    it "maps fields into a FieldSet, discarding those with nil values" do
+      point = InfluxDB::Point.new! "foo", a: 1_u64, b: "test", c: nil, d: nil
+      point.fields.should eq({
+        :a => 1_u64,
+        :b => "test",
+      })
+    end
+  end
+
   describe ".[]" do
     it "provides a minimal syntax for point creation" do
       point = InfluxDB::Point["foo", a: 1_u64]

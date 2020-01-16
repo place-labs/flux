@@ -16,7 +16,7 @@ struct InfluxDB::Point
 
   getter(tags) { TagSet.new }
 
-  getter fields = FieldSet.new
+  getter fields : FieldSet
 
   getter timestamp : Time?
 
@@ -25,16 +25,37 @@ struct InfluxDB::Point
   end
 
   # Creates a new data point that can be serialized for entry to InfluxDB.
-  def initialize(@measurement, @timestamp = nil, @tags = nil, **fields : **T) forall T
+  def self.new(measurement, timestamp = nil, tags = nil, **fields : **T) forall T
     {% raise "points must have at least one field" if T.keys.empty? %}
 
+    fieldset = FieldSet.new
     {% for key, type in T %}
-      {% unless FieldType.union_types.includes? type %}
-        {% raise "invalid type for #{key} (#{type}) - fields must be one of #{FieldType.union_types.join(", ").id}" %}
+      {% unless type < FieldType %}
+        {% raise "invalid type for '#{key}' (#{type}) - fields must be #{FieldType}" %}
       {% end %}
-
-      self.fields[{{key.symbolize}}] = fields[{{key.symbolize}}]
+      fieldset[{{key.symbolize}}] = fields[{{key.symbolize}}]
     {% end %}
+
+    new measurement, fieldset, timestamp, tags
+  end
+
+  # Creates a point from a set of nilable fields, discarding any that are nil.
+  def self.new!(measurement, timestamp = nil, tags = nil, **fields : **T) forall T
+    {% raise "points must have at least one field" if T.keys.empty? %}
+
+    fieldset = FieldSet.new
+    {% for key, type in T %}
+      {% unless type < FieldType? %}
+        {% raise "invalid type for '#{key}' (#{type}) - fields must be #{FieldType?}" %}
+      {% end %}
+      fieldset[{{key.symbolize}}] = fields[{{key.symbolize}}].not_nil! \
+        unless fields[{{key.symbolize}}].nil?
+    {% end %}
+
+    new measurement, fieldset, timestamp, tags
+  end
+
+  private def initialize(@measurement, @fields, @timestamp = nil, @tags = nil)
   end
 
   # Append or change tags associated with the point.
