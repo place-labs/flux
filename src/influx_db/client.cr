@@ -1,9 +1,12 @@
 require "http/client"
+require "logger"
 require "uri"
 require "./point"
 require "./errors"
 
 class InfluxDB::Client
+  getter log : Logger
+
   private getter connection : HTTP::Client
 
   delegate :connect_timeout=, :read_timeout=, to: connection
@@ -14,7 +17,9 @@ class InfluxDB::Client
   # *token* must be a valid API token on the instance that provides sufficient
   # privaleges for the buckets being interact with. Similarly *org* must match
   # the appropriate *org* name these buckets sit under.
-  def initialize(host, token : String, org : String)
+  def initialize(host, token : String, org : String, logger = nil)
+    @log = logger || Logger.new STDOUT, level: Logger::WARN
+
     uri = URI.parse host
     @connection = HTTP::Client.new uri
 
@@ -60,8 +65,6 @@ class InfluxDB::Client
       param.add "bucket", bucket
       param.add "precision", "s"
     end
-
-    puts "Writing #{data.size} bytes"
 
     request = HTTP::Request.new "POST", "/write?#{params}", body: data
     request.content_length = data.size
