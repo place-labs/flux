@@ -1,17 +1,22 @@
 require "./line_protocol"
 
 # Model for InfluxDB data points.
+#
+# TODO: make this generic over a NamedTuple of the associated fields. Currently
+# this causes issues elsewhere as you can not have an `Array`, `Channel` etc of
+# a generic type.
 struct InfluxDB::Point
-  alias TagSet = Hash(Symbol, String | Symbol)
+  alias TagSet = Hash(Symbol, String)
 
-  alias FieldSet = Hash(Symbol, Float32 | Float64 | Int32 | Int64 | UInt32 |
-                        UInt64 | Bool | String)
+  alias FieldType = Float64 | Int64 | UInt64 | String | Bool
+
+  alias FieldSet = Hash(Symbol, FieldType)
 
   getter measurement : String
 
   getter(tags) { TagSet.new }
 
-  getter fields : FieldSet
+  getter fields = FieldSet.new
 
   getter timestamp : Time?
 
@@ -21,20 +26,21 @@ struct InfluxDB::Point
 
   # Creates a new data point that can be serialized for entry to InfluxDB.
   def initialize(@measurement, @timestamp = nil, @tags = nil, **fields : **T) forall T
-    raise ArgumentError.new "points must include at least one field" if fields.empty?
+    {% raise "points must have at least one field" if T.keys.empty? %}
 
-    # FIXME refactor / neaten up when time allows
-    @fields = FieldSet.new
-    {% for k in T %}
-      @fields[{{k.symbolize}}] = fields[{{k.symbolize}}].not_nil! \
-        unless fields[{{k.symbolize}}].nil?
+    {% for key, type in T %}
+      {% unless FieldType.union_types.includes? type %}
+        {% raise "invalid type for #{key} (#{type}) - fields must be one of #{FieldType.union_types.join(", ").id}" %}
+      {% end %}
+
+      self.fields[{{key.symbolize}}] = fields[{{key.symbolize}}]
     {% end %}
   end
 
   # Append or change tags associated with the point.
-  def tag(**t : **T) forall T
-    {% for k in T %}
-      tags[{{k.symbolize}}] = t[{{k.symbolize}}]
+  def tag(**tags : **T) forall T
+    {% for key in T %}
+      self.tags[{{key.symbolize}}] = tags[{{key.symbolize}}]
     {% end %}
   end
 

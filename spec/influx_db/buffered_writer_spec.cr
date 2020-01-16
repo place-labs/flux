@@ -5,8 +5,8 @@ describe InfluxDB::BufferedWriter do
   writer = InfluxDB::BufferedWriter.new client, bucket: "test", batch_size: 5, flush_delay: 100.milliseconds
 
   points = [] of InfluxDB::Point
-  13.times do |idx|
-    points << InfluxDB::Point["name", a: Random.rand, idx: idx]
+  13.times do
+    points << InfluxDB::Point["name", a: Random.rand]
   end
 
   describe ".write" do

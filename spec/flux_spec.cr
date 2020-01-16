@@ -11,8 +11,8 @@ describe Flux do
 
   describe ".write" do
     points = [] of InfluxDB::Point
-    7.times do |idx|
-      points << InfluxDB::Point["name", a: Random.rand, idx: idx]
+    7.times do
+      points << InfluxDB::Point["name", a: Random.rand]
     end
 
     context "when not configured" do
