@@ -20,10 +20,6 @@ struct InfluxDB::Point
 
   getter timestamp : Time?
 
-  def self.[](measurement, timestamp = nil, **fields)
-    new measurement, timestamp, **fields
-  end
-
   # Creates a new data point that can be serialized for entry to InfluxDB.
   def self.new(measurement, timestamp = nil, tags = nil, **fields : **T) forall T
     {% raise "points must have at least one field" if T.keys.empty? %}

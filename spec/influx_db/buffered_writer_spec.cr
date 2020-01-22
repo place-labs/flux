@@ -6,7 +6,7 @@ describe InfluxDB::BufferedWriter do
 
   points = [] of InfluxDB::Point
   13.times do
-    points << InfluxDB::Point["name", a: Random.rand]
+    points << InfluxDB::Point.new "name", a: Random.rand
   end
 
   describe ".write" do

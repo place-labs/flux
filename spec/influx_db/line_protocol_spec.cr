@@ -44,7 +44,7 @@ describe InfluxDB::LineProtocol do
     end
 
     it "serializes without a timestamp (uses server rx time)" do
-      point = InfluxDB::Point["foo", a: 1_i64]
+      point = InfluxDB::Point.new "foo", a: 1_i64
       point.tag test: "bar"
       InfluxDB::LineProtocol.serialize(point).should eq("foo,test=bar a=1i")
     end
