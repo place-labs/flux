@@ -17,7 +17,6 @@ describe InfluxDB::Client do
           },
           query: {
             "bucket"    => "test",
-            "precision" => "s",
             "org"       => "foo",
           },
           body: points.first.to_s
@@ -33,7 +32,6 @@ describe InfluxDB::Client do
           },
           query: {
             "bucket"    => "test",
-            "precision" => "s",
             "org"       => "foo",
           },
           body: points.join '\n'

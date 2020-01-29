@@ -44,11 +44,7 @@ module InfluxDB::LineProtocol
       end
     end
 
-    ts = point.timestamp
-    unless ts.nil?
-      io << ' '
-      io << ts.to_unix
-    end
+    point.timestamp.try &.to_s " %s%N", io
 
     io
   end

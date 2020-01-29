@@ -2,8 +2,8 @@ require "../spec_helper"
 
 describe InfluxDB::LineProtocol do
   describe ".serialize" do
-    time = Time.utc
-    ts = time.to_unix
+    time = Time.utc(2009, 2, 13, 23, 31, 30)
+    ts = "1234567890000000000"
 
     it "serializes integers" do
       point = InfluxDB::Point.new "foo", time, a: 1_i64

@@ -63,7 +63,6 @@ class InfluxDB::Client
   private def write_internal(bucket : String, data : IO) : Nil
     params = HTTP::Params.build do |param|
       param.add "bucket", bucket
-      param.add "precision", "s"
     end
 
     request = HTTP::Request.new "POST", "/write?#{params}", body: data

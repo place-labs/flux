@@ -18,7 +18,6 @@ describe InfluxDB::BufferedWriter do
           },
           query: {
             "bucket"    => "test",
-            "precision" => "s",
             "org"       => "foo",
           },
           body: body_points.join '\n'
