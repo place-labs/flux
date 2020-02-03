@@ -33,11 +33,10 @@ describe InfluxDB::Point do
 
   describe "to_s" do
     it "serializes to line procotol" do
-      time = Time.utc
-      ts = "#{time.to_unix}#{time.nanosecond}"
+      time = Time.utc(2009, 2, 13, 23, 31, 30)
       point = InfluxDB::Point.new "foo", time, a: 1_u64
       point.tag test: "bar"
-      point.to_s.should eq("foo,test=bar a=1u #{ts}")
+      point.to_s.should eq("foo,test=bar a=1u 1234567890000000000")
     end
   end
 end
