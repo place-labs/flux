@@ -28,22 +28,20 @@ module Flux
     config = Options.new
     yield config
 
-    begin
-      client = InfluxDB::Client.new(
-        host: config.host.not_nil!,
-        token: config.api_key.not_nil!,
-        org: config.org.not_nil!
-      )
-      @@client = client
+    @@client = InfluxDB::Client.new(
+      host: config.host.not_nil!,
+      token: config.api_key.not_nil!,
+      org: config.org.not_nil!
+    )
 
-      bucket = config.bucket
-      unless bucket.nil?
-        @@writer = InfluxDB::BufferedWriter.new client, bucket,
-          config.batch_size, config.flush_delay
-      end
-    rescue NilAssertionError
-      raise "Incomplete configuration - host, token and org must be specified"
-    end
+    @@writer = InfluxDB::BufferedWriter.new(
+      @@client.not_nil!,
+      config.bucket.not_nil!,
+      config.batch_size,
+      config.flush_delay
+    )
+  rescue NilAssertionError
+      raise "Incomplete configuration - host, token, org and bucket must be specified"
   end
 
   # Writes a point the default configured bucket.
