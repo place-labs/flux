@@ -39,8 +39,6 @@ module InfluxDB::LineProtocol
         field << 'u'
       when Float
         field << v
-      else
-        raise "Invalid field type: #{v}"
       end
     end
 
