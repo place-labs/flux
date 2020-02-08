@@ -60,7 +60,7 @@ class InfluxDB::Client
 
   # Write a set of data points to *bucket* on the connected instance.
   # TODO: check influx support for chunked transfer encoding
-  private def write_internal(bucket : String, data : IO) : Nil
+  private def write_internal(bucket : String, data : IO)
     params = HTTP::Params.build do |param|
       param.add "bucket", bucket
     end
@@ -70,7 +70,7 @@ class InfluxDB::Client
 
     response = connection.exec request
 
-    InfluxDB.check_response response
+    Result.from(response).value
   end
 
   # Runs a query on the connected InfluxDB instance.
@@ -83,8 +83,6 @@ class InfluxDB::Client
 
     response = connection.post "/query", headers, body
 
-    InfluxDB.check_response response
-
-    response.body_io
+    Result.from(response).map(&.body_io).value
   end
 end
