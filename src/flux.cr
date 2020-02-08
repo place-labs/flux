@@ -11,6 +11,7 @@ module Flux
     property bucket : String? = nil
     property batch_size : Int32 = 5000
     property flush_delay : Time::Span = 1.seconds
+    property logger : Logger? = nil
   end
 
   # Global client instance used by module level convinience wrappers.
@@ -31,14 +32,15 @@ module Flux
     @@client = InfluxDB::Client.new(
       host: config.host.not_nil!,
       token: config.api_key.not_nil!,
-      org: config.org.not_nil!
+      org: config.org.not_nil!,
+      logger: config.logger
     )
 
     @@writer = InfluxDB::BufferedWriter.new(
-      @@client.not_nil!,
-      config.bucket.not_nil!,
-      config.batch_size,
-      config.flush_delay
+      client: @@client.not_nil!,
+      bucket: config.bucket.not_nil!,
+      batch_size: config.batch_size,
+      flush_delay: config.flush_delay
     )
   rescue NilAssertionError
       raise "Incomplete configuration - host, token, org and bucket must be specified"
