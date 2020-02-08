@@ -70,6 +70,11 @@ class InfluxDB::Client
 
     response = connection.exec request
 
+    # FIXME: currently this is triggering a compiler bug. Re-enable status code
+    # checked when resolved.
+    # See: https://github.com/crystal-lang/crystal/issues/7113
+    # Result.from(response).is(HTTP::Status::NO_CONTENT).value
+
     Result.from(response).value
   end
 
