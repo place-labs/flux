@@ -20,15 +20,29 @@ module InfluxDB
     end
 
     getter message : String
+
     def initialize(@message); end
+
+    def to_s(io : IO)
+      io << message
+    end
   end
 
   class ClientError < Error; end
 
   class TooManyRequests < ClientError
     getter retry_after : Int32
-    def initialize(@message, @retry_after = 30); end
+
+    def initialize(@message, @retry_after = 30)
+      super "Rate limited (retry after #{retry_after})"
+    end
   end
 
   class ServerError < Error; end
+
+  class UnexpectedResponse < Error
+    def initialize(status : HTTP::Status, expected : HTTP::Status)
+      super "Unexpected response (received #{status}, expected #{expected})"
+    end
+  end
 end

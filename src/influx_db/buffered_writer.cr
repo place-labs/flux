@@ -83,21 +83,21 @@ class InfluxDB::BufferedWriter
     result = client.write bucket, points
     case result
     when TooManyRequests
-      client.log.warn "Rate limited by server. Retrying in #{result.retry_after}", "BufferedWriter"
+      client.log.warn result
       sleep result.retry_after
       write points
     when ServerError
       retries -= 1
       if retries > 0
-        client.log.warn "Server error: #{result.message}, retrying", "BufferedWriter"
+        client.log.warn "#{result}, retrying write request"
         write points, retries
       else
-        client.log.error "Server error: #{result.message}, retires exhausted", "BufferedWriter"
+        client.log.error "#{result}, retries exhausted - dropping write request"
       end
     when Error
-      client.log.error "Dropping request due to #{result.message}", "BufferedWriter"
+      client.log.error "#{result}, dropping write request"
     else
-      client.log.info "#{points.size} points written", "BufferedWriter"
+      client.log.info "#{points.size} points written"
     end
   end
 end

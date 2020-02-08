@@ -35,14 +35,14 @@ class InfluxDB::Client
   # In most cases this _should not_ be used due the associated request overhead.
   # When writing points intermittently a `Writer` can be used to provide
   # buffering and batching.
-  def write(bucket : String, point : Point) : Nil
+  def write(bucket : String, point : Point)
     write_internal bucket do |io|
       io << point
     end
   end
 
   # Perform a synchronous write of a set of *points* to the passed *bucket*.
-  def write(bucket : String, points : Enumerable(Point)) : Nil
+  def write(bucket : String, points : Enumerable(Point))
     write_internal bucket do |io|
       points.join '\n', io
     end
