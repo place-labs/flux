@@ -2,15 +2,15 @@ require "http/client/response"
 require "burrito/either"
 require "../errors"
 
-struct Flux::Client::Result
+struct Flux::Client::Response
   alias Type = Either(Flux::Error, HTTP::Client::Response)
 
   def self.from(response : HTTP::Client::Response)
     error = Error.from response
     if error
-      Result.failure error
+      failure error
     else
-      Result.success response
+      success response
     end
   end
 

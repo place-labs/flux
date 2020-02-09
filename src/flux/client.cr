@@ -79,7 +79,7 @@ class Flux::Client
     # See: https://github.com/crystal-lang/crystal/issues/7113
     # Result.from(response).is(HTTP::Status::NO_CONTENT).value
 
-    Result.from(response).value
+    Response.from(response).value
   end
 
   # Runs a query on the connected InfluxDB instance.
@@ -92,6 +92,6 @@ class Flux::Client
 
     response = connection.post "/query", headers, body
 
-    Result.from(response).map(&.body_io).value
+    Response.from(response).map(&.body_io).value
   end
 end
