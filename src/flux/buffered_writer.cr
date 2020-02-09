@@ -2,8 +2,8 @@ require "tasker"
 require "./client"
 require "./point"
 
-class InfluxDB::BufferedWriter
-  private getter client : InfluxDB::Client
+class Flux::BufferedWriter
+  private getter client : Flux::Client
 
   private getter bucket : String
 

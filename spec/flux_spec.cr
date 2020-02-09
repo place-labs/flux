@@ -10,9 +10,9 @@ describe Flux do
   end
 
   describe ".write" do
-    points = [] of InfluxDB::Point
+    points = [] of Flux::Point
     7.times do
-      points << InfluxDB::Point.new "name", a: Random.rand
+      points << Flux::Point.new "name", a: Random.rand
     end
 
     context "when not configured" do
@@ -60,7 +60,7 @@ describe Flux do
             },
             body: points.join '\n'
           )
-        points.each &->Flux.write(InfluxDB::Point)
+        points.each &->Flux.write(Flux::Point)
         sleep 0.1
       end
     end

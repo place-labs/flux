@@ -1,11 +1,11 @@
 require "../spec_helper"
 
-describe InfluxDB::Client do
-  client = InfluxDB::Client.new "http://example.com", org: "foo", token: "abc"
+describe Flux::Client do
+  client = Flux::Client.new "http://example.com", org: "foo", token: "abc"
 
-  points = [] of InfluxDB::Point
+  points = [] of Flux::Point
   100.times do
-    points << InfluxDB::Point.new "name", a: Random.rand
+    points << Flux::Point.new "name", a: Random.rand
   end
 
   describe "#write" do

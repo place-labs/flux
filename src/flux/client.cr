@@ -2,9 +2,13 @@ require "http/client"
 require "logger"
 require "uri"
 require "./point"
-require "./errors"
 
-class InfluxDB::Client
+# FIXME: underclared namespaces are infered to by modules by default. Drop this
+# when https://github.com/crystal-lang/crystal/issues/8685 is resolved.
+class Flux::Client; end
+require "./client/*"
+
+class Flux::Client
   getter log : Logger
 
   private getter connection : HTTP::Client

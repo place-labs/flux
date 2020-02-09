@@ -1,5 +1,5 @@
-require "./influx_db/*"
-# require "./flux/*"
+require "./flux/client"
+require "./flux/buffered_writer"
 
 module Flux
   VERSION = `shards version`
@@ -15,10 +15,10 @@ module Flux
   end
 
   # Global client instance used by module level convinience wrappers.
-  @@client : InfluxDB::Client?
+  @@client : Flux::Client?
 
   # Global writer instance used by module level convinience wrappers.
-  @@writer : InfluxDB::BufferedWriter?
+  @@writer : Flux::BufferedWriter?
 
   # Sets the root config used by `Flux.write` and `Flux.query` and create a
   # global client based on this.
@@ -29,14 +29,14 @@ module Flux
     config = Options.new
     yield config
 
-    @@client = InfluxDB::Client.new(
+    @@client = Flux::Client.new(
       host: config.host.not_nil!,
       token: config.api_key.not_nil!,
       org: config.org.not_nil!,
       logger: config.logger
     )
 
-    @@writer = InfluxDB::BufferedWriter.new(
+    @@writer = Flux::BufferedWriter.new(
       client: @@client.not_nil!,
       bucket: config.bucket.not_nil!,
       batch_size: config.batch_size,

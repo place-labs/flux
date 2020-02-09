@@ -5,7 +5,7 @@ require "./line_protocol"
 # TODO: make this generic over a NamedTuple of the associated fields. Currently
 # this causes issues elsewhere as you can not have an `Array`, `Channel` etc of
 # a generic type.
-struct InfluxDB::Point
+struct Flux::Point
   alias TagSet = Hash(Symbol, String)
 
   alias FieldType = Float64 | Int64 | UInt64 | String | Bool

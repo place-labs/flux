@@ -1,16 +1,16 @@
 require "../spec_helper"
 
-describe InfluxDB::BufferedWriter do
-  client = InfluxDB::Client.new "http://example.com", org: "foo", token: "abc"
-  writer = InfluxDB::BufferedWriter.new client, bucket: "test", batch_size: 5, flush_delay: 100.milliseconds
+describe Flux::BufferedWriter do
+  client = Flux::Client.new "http://example.com", org: "foo", token: "abc"
+  writer = Flux::BufferedWriter.new client, bucket: "test", batch_size: 5, flush_delay: 100.milliseconds
 
-  points = [] of InfluxDB::Point
+  points = [] of Flux::Point
   13.times do
-    points << InfluxDB::Point.new "name", a: Random.rand
+    points << Flux::Point.new "name", a: Random.rand
   end
 
   describe ".write" do
-    build_mock = ->(body_points : Array(InfluxDB::Point)) do
+    build_mock = ->(body_points : Array(Flux::Point)) do
       WebMock.stub(:post, "http://example.com/api/v2/write")
         .with(
           headers: {
@@ -32,7 +32,7 @@ describe InfluxDB::BufferedWriter do
 
     it "writes multiple points as a single request" do
       points.each_slice 5, &build_mock
-      points.each &->writer.enqueue(InfluxDB::Point)
+      points.each &->writer.enqueue(Flux::Point)
       sleep 0.3
     end
   end

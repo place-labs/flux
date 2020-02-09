@@ -1,6 +1,6 @@
 require "http/client/response"
 
-module InfluxDB
+module Flux
   # Base class for all error types originating from interaction with InfluxDB.
   abstract class Error
     # Contructs a concrete error object from a client response.

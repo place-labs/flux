@@ -1,9 +1,9 @@
 require "http/client/response"
 require "burrito/either"
-require "./errors"
+require "../errors"
 
-struct InfluxDB::Result
-  alias Type = Either(InfluxDB::Error, HTTP::Client::Response)
+struct Flux::Client::Result
+  alias Type = Either(Flux::Error, HTTP::Client::Response)
 
   def self.from(response : HTTP::Client::Response)
     error = Error.from response
