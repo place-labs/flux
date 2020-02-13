@@ -12,9 +12,6 @@ dependencies:
   tasker:
     github: spider-gazelle/tasker
     branch: master
-  burrito:
-    github: aca-labs/burrito
-    branch: master
 
 development_dependencies:
   ameba:

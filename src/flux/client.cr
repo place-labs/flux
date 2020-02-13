@@ -1,13 +1,9 @@
 require "http/client"
 require "logger"
 require "uri"
+require "./errors"
 require "./point"
 require "./query_result"
-
-# FIXME: underclared namespaces are infered to by modules by default. Drop this
-# when https://github.com/crystal-lang/crystal/issues/8685 is resolved.
-class Flux::Client; end
-require "./client/*"
 
 class Flux::Client
   getter log : Logger
@@ -74,25 +70,45 @@ class Flux::Client
     request.content_length = data.size
 
     response = connection.exec request
+    check_response! response
 
-    # FIXME: currently this is triggering a compiler bug. Re-enable status code
-    # checked when resolved.
-    # See: https://github.com/crystal-lang/crystal/issues/7113
-    # Result.from(response).is(HTTP::Status::NO_CONTENT).value
+    nil
+  end
 
-    Response.from(response).value
+  # Runs a query on the connected InfluxDB instance.
+  #
+  # *expression* must be a valid Flux expression. All returned records will by a
+  # Hash of String => String. To parse into stricter types, use variant of this
+  # method accepting a block.
+  def query(expression : String)
+    query expression, &.to_h
   end
 
   # Runs a query on the connected InfluxDB instance.
   #
   # *expression* must be a valid Flux expression.
-  def query(expression : String)
+  def query(expression : String, &block : CSV::Row, Array(QueryResult::Column) -> T) forall T
+    query_internal expression do |io|
+      QueryResult.parse io, &block
+    end
+  end
+
+  # Runs a query on the connected InfluxDB instance, returning the result.
+  private def query_internal(expression : String, &block : IO -> T) forall T
     headers = HTTP::Headers.new
     headers.add "Accept", "application/csv"
     headers.add "Content-type", "application/vnd.flux"
 
-    response = connection.post "/query", headers, body
+    body = { query: expression }.to_json
 
-    Response.from(response).map(&.body_io).value
+    connection.post "/query", headers, body do |response|
+      check_response! response
+      yield response.body_io
+    end
+  end
+
+  # Checks a HTTP response and raises an error if the status was not successful.
+  private def check_response!(response : HTTP::Client::Response) : Nil
+    Error.from(response).try { |e| raise e }
   end
 end

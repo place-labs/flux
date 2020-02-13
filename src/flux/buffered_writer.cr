@@ -80,24 +80,21 @@ class Flux::BufferedWriter
   #
   # Error will be retried as appropriate.
   private def write(points : Enumerable(Point), retries = 3)
-    result = client.write bucket, points
-    case result
-    when TooManyRequests
-      client.log.warn result
-      sleep result.retry_after
-      write points
-    when ServerError
-      retries -= 1
-      if retries > 0
-        client.log.warn "#{result}, retrying write request"
-        write points, retries
-      else
-        client.log.error "#{result}, retries exhausted - dropping write request"
-      end
-    when Error
-      client.log.error "#{result}, dropping write request"
+    client.write bucket, points
+    client.log.info "#{points.size} points written"
+  rescue ex : TooManyRequests
+    client.log.warn ex.message
+    sleep ex.retry_after
+    write points
+  rescue ex : ServerError
+    retries -= 1
+    if retries > 0
+      client.log.warn "#{ex.message}, retrying write request"
+      write points, retries
     else
-      client.log.info "#{points.size} points written"
+      client.log.error "#{ex.message}, retries exhausted - dropping write request"
     end
+  rescue ex : Error
+    client.log.error "#{ex.message}, dropping write request"
   end
 end

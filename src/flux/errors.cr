@@ -2,7 +2,7 @@ require "http/client/response"
 
 module Flux
   # Base class for all error types originating from interaction with InfluxDB.
-  abstract class Error
+  abstract class Error < Exception
     # Contructs a concrete error object from a client response.
     def self.from(response : HTTP::Client::Response) : Error?
       message = response.status_message || "HTTP #{response.status_code})"
@@ -17,14 +17,6 @@ module Flux
       when 500..599
         ServerError.new message
       end
-    end
-
-    getter message : String
-
-    def initialize(@message); end
-
-    def to_s(io : IO)
-      io << message
     end
   end
 
