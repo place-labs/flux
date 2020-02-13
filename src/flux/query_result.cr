@@ -2,12 +2,25 @@ require "./annotated_csv"
 require "./query_result/*"
 
 # Parsers and data structures for working with returned query results.
+#
+# FIXME: support query results containing mutliple schemas
 module Flux::QueryResult
   extend self
 
-  # FIXME: support query results containing mutliple schemas
+  # Parses a response into a set of tables with each row as an Array of Strings.
   def parse(io : IO) : Enumerable(Table(Array(String)))
-    tables = [] of Table(Array(String))
+    parse io, &.to_a
+  end
+
+  # Parses a response into a set of tables, using the passed block to map to the
+  # record types.
+  def parse(io : IO, &block : CSV::Row -> T) : Enumerable(Table(T)) forall T
+    parse io { |row, _| block.call row }
+  end
+
+  # :ditto:
+  def parse(io : IO, &block : CSV::Row, Array(Column) -> T) : Enumerable(Table(T)) forall T
+    tables = [] of Table(T)
 
     AnnotatedCSV.new(io, headers: true).each do |csv|
       idx = csv["table"].to_i
@@ -23,11 +36,11 @@ module Flux::QueryResult
             default: meta["default"]
           )
         end
-        table = Table(Array(String)).new columns
+        table = Table(T).new columns
         tables << table
       end
 
-      table << csv.row.to_a
+      table << block.call(csv.row, table.columns)
     end
 
     tables
