@@ -101,12 +101,7 @@ class Flux::Client
 
     body = {
       query: expression,
-      dialect: {
-        header: true,
-        annotations: ["group", "datatype", "default"],
-        commentPrefix: AnnotatedCSV::ANNOTATION_CHAR.to_s,
-        dateTimeFormat: "RFC3339"
-      }
+      dialect: AnnotatedCSV::DIALECT
     }.to_json
 
     connection.post "/query", headers, body do |response|

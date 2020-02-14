@@ -62,13 +62,14 @@ describe Flux::Client do
         headers: {
           "Authorization" => "Token abc",
           "Accept" => "application/csv",
-          "Content-type" => "application/vnd.flux"
+          "Content-type" => "application/json"
         },
         query: {
           "org" => "foo",
         },
         body: {
-          query: "test"
+          query: "test",
+          dialect: Flux::AnnotatedCSV::DIALECT
         }.to_json
       )
       .to_return(io)

@@ -8,6 +8,15 @@ require "csv"
 class Flux::AnnotatedCSV < CSV
   ANNOTATION_CHAR = '#'
 
+  # Dialect options for query responses.
+  # See: https://www.w3.org/TR/2015/REC-tabular-metadata-20151217/#dialect-descriptions
+  DIALECT = {
+    header: true,
+    annotations: ["group", "datatype", "default"],
+    commentPrefix: ANNOTATION_CHAR.to_s,
+    dateTimeFormat: "RFC3339"
+  }
+
   @annotations : Array(Hash(String, String))?
 
   def initialize(string_or_io : IO, headers = false, @strip = false, separator : Char = DEFAULT_SEPARATOR, quote_char : Char = DEFAULT_QUOTE_CHAR)
