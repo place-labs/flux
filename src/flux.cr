@@ -56,8 +56,16 @@ module Flux
 
   # Executes a query on a the globally configured instance.
   def self.query(expression)
-    client = @@client.no_nil!
+    client = @@client.not_nil!
     client.query expression
+  rescue NilAssertionError
+    raise "Global config invalid or not set - use Flux.configure"
+  end
+
+  # :ditto:
+  def self.query(expression, &block : QueryResult::Row, Array(QueryResult::Column) -> T) forall T
+    client = @@client.not_nil!
+    client.query expression, &block
   rescue NilAssertionError
     raise "Global config invalid or not set - use Flux.configure"
   end
