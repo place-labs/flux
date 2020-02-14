@@ -87,7 +87,7 @@ class Flux::Client
   # Runs a query on the connected InfluxDB instance.
   #
   # *expression* must be a valid Flux expression.
-  def query(expression : String, &block : CSV::Row, Array(QueryResult::Column) -> T) forall T
+  def query(expression : String, &block : QueryResult::Row, Array(QueryResult::Column) -> T) forall T
     query_internal expression do |io|
       QueryResult.parse io, &block
     end
