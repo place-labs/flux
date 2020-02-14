@@ -65,7 +65,7 @@ describe Flux::Client do
           "Content-type" => "application/vnd.flux"
         },
         query: {
-          "org"       => "foo",
+          "org" => "foo",
         },
         body: {
           query: "test"
