@@ -97,9 +97,17 @@ class Flux::Client
   private def query_internal(expression : String, &block : IO -> T) forall T
     headers = HTTP::Headers.new
     headers.add "Accept", "application/csv"
-    headers.add "Content-type", "application/vnd.flux"
+    headers.add "Content-type", "application/json"
 
-    body = { query: expression }.to_json
+    body = {
+      query: expression,
+      dialect: {
+        header: true,
+        annotations: ["group", "datatype", "default"],
+        commentPrefix: AnnotatedCSV::ANNOTATION_CHAR.to_s,
+        dateTimeFormat: "RFC3339"
+      }
+    }.to_json
 
     connection.post "/query", headers, body do |response|
       check_response! response
