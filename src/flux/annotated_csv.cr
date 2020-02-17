@@ -19,7 +19,7 @@ class Flux::AnnotatedCSV < CSV
 
   @annotations : Array(Hash(String, String))?
 
-  def initialize(string_or_io : IO, headers = false, @strip = false, separator : Char = DEFAULT_SEPARATOR, quote_char : Char = DEFAULT_QUOTE_CHAR)
+  def initialize(string_or_io : String | IO, headers = false, @strip = false, separator : Char = DEFAULT_SEPARATOR, quote_char : Char = DEFAULT_QUOTE_CHAR)
     @parser = Parser.new(string_or_io, separator, quote_char)
 
     while @parser.peek == ANNOTATION_CHAR && (cols = @parser.next_row)
