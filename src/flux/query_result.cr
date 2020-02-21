@@ -8,21 +8,21 @@ module Flux::QueryResult
   extend self
 
   # Parses a response into a set of tables with each row as an Array of Strings.
-  def parse(io : IO) : Enumerable(Table(Array(String)))
-    parse io, &.to_a
+  def parse(string_or_io : String | IO) : Enumerable(Table(Array(String)))
+    parse string_or_io, &.to_a
   end
 
   # Parses a response into a set of tables, using the passed block to map to the
   # record types.
-  def parse(io : IO, &block : CSV::Row -> T) : Enumerable(Table(T)) forall T
-    parse io { |row, _| block.call row }
+  def parse(string_or_io : String | IO, &block : CSV::Row -> T) : Enumerable(Table(T)) forall T
+    parse string_or_io { |row, _| block.call row }
   end
 
   # :ditto:
-  def parse(io : IO, &block : CSV::Row, Array(Column) -> T) : Enumerable(Table(T)) forall T
+  def parse(string_or_io : String | IO, &block : CSV::Row, Array(Column) -> T) : Enumerable(Table(T)) forall T
     tables = [] of Table(T)
 
-    AnnotatedCSV.new(io, headers: true).each do |csv|
+    AnnotatedCSV.new(string_or_io, headers: true).each do |csv|
       idx = csv["table"].to_i
       table = tables[idx]?
 
