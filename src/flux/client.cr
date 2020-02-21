@@ -81,7 +81,9 @@ class Flux::Client
   # Hash of String => String. To parse into stricter types, use variant of this
   # method accepting a block.
   def query(expression : String)
-    query expression, &.to_h
+    query_internal expression do |io|
+      QueryResult.parse(io) { |row, _| row.to_h }
+    end
   end
 
   # Runs a query on the connected InfluxDB instance.
@@ -94,10 +96,10 @@ class Flux::Client
   end
 
   # Runs a query on the connected InfluxDB instance, returning the result.
-  private def query_internal(expression : String, &block : IO -> T) forall T
+  private def query_internal(expression : String, &block : IO -> T) : T forall T
     headers = HTTP::Headers.new
     headers.add "Accept", "application/csv"
-    headers.add "Content-type", "application/json"
+    headers.add "Content-Type", "application/json"
 
     body = {
       query: expression,
