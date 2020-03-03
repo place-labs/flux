@@ -1,6 +1,6 @@
 # flux
 
-TODO: Write a description here
+Client library for pushing data to, and querying information from InfluxDB v2.x.
 
 ## Installation
 
@@ -20,11 +20,36 @@ TODO: Write a description here
 require "flux"
 ```
 
-TODO: Write usage instructions here
+### Configure the client
 
-## Development
+Define your client configuration with `Flux.configure`. This yields an
+[`Options`](https://github.com/aca-labs/flux/blob/master/src/flux.cr#L7-L15) object
+with appriopriate setters.
 
-TODO: Write development instructions here
+```crystal
+Flux.configure do |settings|
+  settings.host = ENV["INFLUX_HOST"]? || abort "INFLUX_HOST env var not set"
+  settings.api_key = ENV["INFLUX_API_KEY"]? || abort "INFLUX_API_KEY env var not set"
+  settings.org = ENV["INFLUX_ORG"]? || "vandelay-industries"
+  settings.bucket = ENV["INFLUX_BUCKET"]? || "latex-sales"
+end
+```
+
+### Writing data
+
+Use `Flux.write` to enqueue a point. Writes are automatically buffered and
+flushed after either a time delay or optimal write size.
+
+### Queries
+
+Once information is available in the bucket, this is queries with `Flux.query`.
+This access a [Flux
+expression](https://v2.docs.influxdata.com/v2.0/reference/flux/)
+
+### Parallel clients
+
+If your application requires connectivity with more that one InfluxDB instance
+or bucket, clients can be directly created with `Flux::Client.new`.
 
 ## Contributing
 
