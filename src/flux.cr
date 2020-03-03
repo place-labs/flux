@@ -43,7 +43,7 @@ module Flux
       flush_delay: config.flush_delay
     )
   rescue NilAssertionError
-      raise "Incomplete configuration - host, token, org and bucket must be specified"
+    raise "Incomplete configuration - host, token, org and bucket must be specified"
   end
 
   # Writes a point the default configured bucket.

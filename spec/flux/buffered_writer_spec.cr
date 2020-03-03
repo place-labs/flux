@@ -17,8 +17,8 @@ describe Flux::BufferedWriter do
             "Authorization" => "Token abc",
           },
           query: {
-            "bucket"    => "test",
-            "org"       => "foo",
+            "bucket" => "test",
+            "org"    => "foo",
           },
           body: body_points.join '\n'
         )

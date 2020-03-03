@@ -39,10 +39,10 @@ describe Flux::QueryResult do
     it "allows specifing a custom row parser2" do
       result = Flux::QueryResult.parse io do |row|
         {
-          time: Time::Format::RFC_3339.parse(row["_time"]),
+          time:   Time::Format::RFC_3339.parse(row["_time"]),
           region: row["region"],
-          host: row["host"],
-          value: row["_value"].to_f
+          host:   row["host"],
+          value:  row["_value"].to_f,
         }
       end
       result.first.first[:host].should eq("A")

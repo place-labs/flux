@@ -17,8 +17,8 @@ describe Flux::Client do
             "Authorization" => "Token abc",
           },
           query: {
-            "bucket"    => "test",
-            "org"       => "foo",
+            "bucket" => "test",
+            "org"    => "foo",
           },
           body: points.first.to_s
         )
@@ -32,8 +32,8 @@ describe Flux::Client do
             "Authorization" => "Token abc",
           },
           query: {
-            "bucket"    => "test",
-            "org"       => "foo",
+            "bucket" => "test",
+            "org"    => "foo",
           },
           body: points.join '\n'
         )
@@ -61,15 +61,15 @@ describe Flux::Client do
       .with(
         headers: {
           "Authorization" => "Token abc",
-          "Accept" => "application/csv",
-          "Content-type" => "application/json"
+          "Accept"        => "application/csv",
+          "Content-type"  => "application/json",
         },
         query: {
           "org" => "foo",
         },
         body: {
-          query: "test",
-          dialect: Flux::AnnotatedCSV::DIALECT
+          query:   "test",
+          dialect: Flux::AnnotatedCSV::DIALECT,
         }.to_json
       )
       .to_return(io)
@@ -82,10 +82,10 @@ describe Flux::Client do
     it "provides the ablity to read into a known schema" do
       tables = client.query "test" do |row|
         {
-          time: Time::Format::RFC_3339.parse(row["_time"]),
+          time:   Time::Format::RFC_3339.parse(row["_time"]),
           region: row["region"],
-          host: row["host"],
-          value: row["_value"].to_f
+          host:   row["host"],
+          value:  row["_value"].to_f,
         }
       end
       tables.first.first[:host].should eq("A")

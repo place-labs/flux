@@ -25,16 +25,16 @@ describe Flux::AnnotatedCSV do
       csv.annotations.should be_a(Array(Hash(String, String)))
       csv.annotations[1].should eq({
         "datatype" => "string",
-        "group" => "false",
-        "default" => ""
+        "group"    => "false",
+        "default"  => "",
       })
     end
 
     it "supports lookups based on header names" do
       csv.annotations("_value").should eq({
         "datatype" => "double",
-        "group" => "false",
-        "default" => ""
+        "group"    => "false",
+        "default"  => "",
       })
     end
   end

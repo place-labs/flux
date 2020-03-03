@@ -11,10 +11,10 @@ class Flux::AnnotatedCSV < CSV
   # Dialect options for query responses.
   # See: https://www.w3.org/TR/2015/REC-tabular-metadata-20151217/#dialect-descriptions
   DIALECT = {
-    header: true,
-    annotations: ["group", "datatype", "default"],
-    commentPrefix: ANNOTATION_CHAR.to_s,
-    dateTimeFormat: "RFC3339"
+    header:         true,
+    annotations:    ["group", "datatype", "default"],
+    commentPrefix:  ANNOTATION_CHAR.to_s,
+    dateTimeFormat: "RFC3339",
   }
 
   @annotations : Array(Hash(String, String))?
@@ -27,7 +27,7 @@ class Flux::AnnotatedCSV < CSV
       if annotations = @annotations
         annotations.zip(cols) { |col, value| col[type] = value }
       else
-        @annotations = cols.map { |value| { type => value} }
+        @annotations = cols.map { |value| {type => value} }
       end
     end
 

@@ -102,8 +102,8 @@ class Flux::Client
     headers.add "Content-Type", "application/json"
 
     body = {
-      query: expression,
-      dialect: AnnotatedCSV::DIALECT
+      query:   expression,
+      dialect: AnnotatedCSV::DIALECT,
     }.to_json
 
     connection.post "/query", headers, body do |response|

@@ -39,8 +39,8 @@ describe Flux do
               "Authorization" => "Token abc",
             },
             query: {
-              "bucket"    => "test",
-              "org"       => "foo",
+              "bucket" => "test",
+              "org"    => "foo",
             },
             body: points.first.to_s
           )
@@ -55,8 +55,8 @@ describe Flux do
               "Authorization" => "Token abc",
             },
             query: {
-              "bucket"    => "test",
-              "org"       => "foo",
+              "bucket" => "test",
+              "org"    => "foo",
             },
             body: points.join '\n'
           )
