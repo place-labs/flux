@@ -40,11 +40,11 @@ end
 Use `Flux.write` to enqueue a point. Writes are automatically buffered and
 flushed after either a time delay or optimal write size.
 
-### Queries
+### Running queries
 
-Once information is available in the bucket, this is queries with `Flux.query`.
-This access a [Flux
-expression](https://v2.docs.influxdata.com/v2.0/reference/flux/)
+Once information is available in the bucket, queries are executed with
+`Flux.query`.  This accepts a [Flux
+expression](https://v2.docs.influxdata.com/v2.0/reference/flux/).
 
 ### Parallel clients
 
