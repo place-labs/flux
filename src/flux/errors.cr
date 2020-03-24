@@ -6,21 +6,22 @@ module Flux
   abstract class Error < Exception
     # Contructs a concrete error object from a client response.
     def self.from(response : HTTP::Client::Response) : Error?
-      message = nil
-      begin
-        message = JSON.parse(response.body)["message"].as_s
-      rescue
-        message = response.status_message || "HTTP #{response.status_code})"
-      end
-
       case response.status_code
       when 429
         retry_after = (response.headers["Retry-After"]? || 30).to_i
-        TooManyRequests.new message, retry_after
+        TooManyRequests.new message_from(response), retry_after
       when 400..499
-        ClientError.new message
+        ClientError.new message_from(response)
       when 500..599
-        ServerError.new message
+        ServerError.new message_from(response)
+      end
+    end
+
+    def self.message_from(response : HTTP::Client::Response) : String
+      begin
+        JSON.parse(response.body || response.body_io)["message"].as_s
+      rescue
+        response.status_message || "HTTP #{response.status_code})"
       end
     end
   end
