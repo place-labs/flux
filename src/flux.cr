@@ -46,27 +46,26 @@ module Flux
     raise "Incomplete configuration - host, token, org and bucket must be specified"
   end
 
+  private def self.client
+    @@client || raise "Global config invalid or not set - use Flux.configure before accessing client"
+  end
+
+  private def self.writer
+    @@writer || raise "Global config invalid or not set - use Flux.configure before accessing writer"
+  end
+
   # Writes a point the default configured bucket.
   def self.write(point)
-    writer = @@writer.not_nil!
     writer.enqueue point
-  rescue NilAssertionError
-    raise "Global config invalid or not set - use Flux.configure"
   end
 
   # Executes a query on a the globally configured instance.
   def self.query(expression)
-    client = @@client.not_nil!
     client.query expression
-  rescue NilAssertionError
-    raise "Global config invalid or not set - use Flux.configure"
   end
 
   # :ditto:
   def self.query(expression, &block : QueryResult::Row, Array(QueryResult::Column) -> T) forall T
-    client = @@client.not_nil!
     client.query expression, &block
-  rescue NilAssertionError
-    raise "Global config invalid or not set - use Flux.configure"
   end
 end
