@@ -8,9 +8,7 @@ require "./query_result"
 class Flux::Client
   getter log : Logger
 
-  private getter connection : HTTP::Client
-
-  delegate :connect_timeout=, :read_timeout=, to: connection
+  getter connection : HTTP::Client
 
   # Creates a new InfluxDB client for the instance running at the specified
   # *url*.
