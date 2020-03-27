@@ -7,6 +7,10 @@ module Flux
     # Contructs a concrete error object from a client response.
     def self.from(response : HTTP::Client::Response) : Error?
       case response.status_code
+      when 200..299
+        nil
+      when 300..399
+        Redirect.new message_from(response)
       when 429
         retry_after = (response.headers["Retry-After"]? || 30).to_i
         TooManyRequests.new message_from(response), retry_after
@@ -25,6 +29,8 @@ module Flux
       end
     end
   end
+
+  class Redirect < Error; end
 
   class ClientError < Error; end
 
