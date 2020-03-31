@@ -18,6 +18,7 @@ class Flux::Client
   # the appropriate *org* name these buckets sit under.
   def initialize(host, token : String, org : String, logger = nil)
     @log = logger || Logger.new STDOUT, level: Logger::WARN
+    @conn_mutex = Mutex.new
 
     uri = URI.parse host
     @connection = HTTP::Client.new uri
@@ -67,7 +68,7 @@ class Flux::Client
     request = HTTP::Request.new "POST", "/write?#{params}", body: data
     request.content_length = data.size
 
-    response = connection.exec request
+    response = @conn_mutex.synchronize { connection.exec request }
     check_response! response
 
     nil
@@ -104,10 +105,9 @@ class Flux::Client
       dialect: AnnotatedCSV::DIALECT,
     }.to_json
 
-    connection.post "/query", headers, body do |response|
-      check_response! response
-      yield response.body_io
-    end
+    response = @conn_mutex.synchronize { connection.post "/query", headers, body }
+    check_response! response
+    yield response.body_io
   end
 
   # Checks a HTTP response and raises an error if the status was not successful.
