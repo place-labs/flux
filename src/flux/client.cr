@@ -16,18 +16,19 @@ class Flux::Client
   # *token* must be a valid API token on the instance that provides sufficient
   # privaleges for the buckets being interact with. Similarly *org* must match
   # the appropriate *org* name these buckets sit under.
-  def initialize(host, token : String, org : String, logger = nil)
+  def initialize(host, @token : String, @org : String, logger = nil)
     @log = logger || Logger.new STDOUT, level: Logger::WARN
-    @conn_mutex = Mutex.new
-
-    uri = URI.parse host
-    @connection = HTTP::Client.new uri
-
+    @uri = URI.parse host
+  end
+  
+  private def new_connection
+    connection = HTTP::Client.new @uri
     connection.before_request do |req|
-      req.headers["Authorization"] = "Token #{token}"
+      req.headers["Authorization"] = "Token #{@token}"
       req.path = "/api/v2#{req.path}"
-      req.query_params["org"] = org
+      req.query_params["org"] = @org
     end
+    connection
   end
 
   # Perform a synchronous write of a single *point* to the passed *bucket*.
@@ -68,7 +69,7 @@ class Flux::Client
     request = HTTP::Request.new "POST", "/write?#{params}", body: data
     request.content_length = data.size
 
-    response = @conn_mutex.synchronize { connection.exec request }
+    response = new_connection.exec request
     check_response! response
 
     nil
@@ -105,9 +106,10 @@ class Flux::Client
       dialect: AnnotatedCSV::DIALECT,
     }.to_json
 
-    response = @conn_mutex.synchronize { connection.post "/query", headers, body }
-    check_response! response
-    yield response.body_io
+    new_connection.post "/query", headers, body do |response|
+      check_response! response
+      yield response.body_io
+    end
   end
 
   # Checks a HTTP response and raises an error if the status was not successful.
