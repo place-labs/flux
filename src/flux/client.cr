@@ -8,8 +8,6 @@ require "./query_result"
 class Flux::Client
   getter log : Logger
 
-  getter connection : HTTP::Client
-
   # Creates a new InfluxDB client for the instance running at the specified
   # *url*.
   #
@@ -21,7 +19,7 @@ class Flux::Client
     @uri = URI.parse host
   end
   
-  private def new_connection
+  def connection
     connection = HTTP::Client.new @uri
     connection.before_request do |req|
       req.headers["Authorization"] = "Token #{@token}"
@@ -69,7 +67,7 @@ class Flux::Client
     request = HTTP::Request.new "POST", "/write?#{params}", body: data
     request.content_length = data.size
 
-    response = new_connection.exec request
+    response = connection.exec request
     check_response! response
 
     nil
@@ -106,7 +104,7 @@ class Flux::Client
       dialect: AnnotatedCSV::DIALECT,
     }.to_json
 
-    new_connection.post "/query", headers, body do |response|
+    connection.post "/query", headers, body do |response|
       check_response! response
       yield response.body_io
     end
