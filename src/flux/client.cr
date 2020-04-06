@@ -18,8 +18,10 @@ class Flux::Client
     @log = logger || Logger.new STDOUT, level: Logger::WARN
     @uri = URI.parse host
   end
-  
-  def connection
+
+  # Creates a new `HTTP::Client` for executing a request.
+  # OPTIMIZE: use a resource pool to enable client re-use.
+  private def connection
     connection = HTTP::Client.new @uri
     connection.before_request do |req|
       req.headers["Authorization"] = "Token #{@token}"

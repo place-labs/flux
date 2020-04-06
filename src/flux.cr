@@ -12,7 +12,6 @@ module Flux
     property batch_size : Int32 = 5000
     property flush_delay : Time::Span = 1.seconds
     property logger : Logger? = nil
-    property ssl_no_verify : Bool = false
   end
 
   # Global client instance used by module level convinience wrappers.
@@ -36,10 +35,6 @@ module Flux
       org: config.org.not_nil!,
       logger: config.logger
     )
-
-    if config.ssl_no_verify
-      client.connection.tls?.try &.verify_mode = OpenSSL::SSL::VerifyMode::NONE
-    end
 
     @@writer = Flux::BufferedWriter.new(
       client: @@client.not_nil!,
