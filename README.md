@@ -9,7 +9,7 @@ Client library for pushing data to, and querying information from InfluxDB v2.x.
    ```yaml
    dependencies:
      flux:
-       github: aca-labs/flux
+       github: place-labs/flux
    ```
 
 2. Run `shards install`
@@ -23,7 +23,7 @@ require "flux"
 ### Configure the client
 
 Define your client configuration with `Flux.configure`. This yields an
-[`Options`](https://github.com/aca-labs/flux/blob/master/src/flux.cr#L7-L15) object
+[`Options`](https://github.com/place-labs/flux/blob/master/src/flux.cr#L7-L15) object
 with appriopriate setters.
 
 ```crystal
@@ -53,7 +53,7 @@ or bucket, clients can be directly created with `Flux::Client.new`.
 
 ## Contributing
 
-1. Fork it (<https://github.com/aca-labs/flux/fork>)
+1. Fork it (<https://github.com/place-labs/flux/fork>)
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
