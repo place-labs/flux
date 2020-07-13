@@ -1,17 +1,15 @@
 name: flux
-version: 1.0.4
+version: 1.1.0
+crystal: ~> 0.34
+license: MIT
 
 authors:
-  - Kim Burgess <kim@acaprojects.com>
-
-crystal: 0.33.0
-
-license: MIT
+  - Kim Burgess <kim@place.tech>
+  - Caspian Baska <caspian@place.tech>
 
 dependencies:
   tasker:
     github: spider-gazelle/tasker
-    branch: master
 
 development_dependencies:
   ameba:

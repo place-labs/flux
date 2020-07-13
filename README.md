@@ -6,11 +6,11 @@ Client library for pushing data to, and querying information from InfluxDB v2.x.
 
 1. Add the dependency to your `shard.yml`:
 
-   ```yaml
-   dependencies:
-     flux:
-       github: place-labs/flux
-   ```
+```yaml
+dependencies:
+  flux:
+    github: place-labs/flux
+```
 
 2. Run `shards install`
 
@@ -28,10 +28,10 @@ with appriopriate setters.
 
 ```crystal
 Flux.configure do |settings|
-  settings.host = ENV["INFLUX_HOST"]? || abort "INFLUX_HOST env var not set"
+  settings.host    = ENV["INFLUX_HOST"]? || abort "INFLUX_HOST env var not set"
   settings.api_key = ENV["INFLUX_API_KEY"]? || abort "INFLUX_API_KEY env var not set"
-  settings.org = ENV["INFLUX_ORG"]? || "vandelay-industries"
-  settings.bucket = ENV["INFLUX_BUCKET"]? || "latex-sales"
+  settings.org     = ENV["INFLUX_ORG"]? || "vandelay-industries"
+  settings.bucket  = ENV["INFLUX_BUCKET"]? || "latex-sales"
 end
 ```
 
