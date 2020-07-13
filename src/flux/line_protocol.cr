@@ -19,7 +19,7 @@ module Flux::LineProtocol
 
     io << ' '
 
-    point.fields.join(',', io) do |(k, v), field|
+    point.fields.join(io, ',') do |(k, v), field|
       field << k
       field << '='
       case v
@@ -42,7 +42,7 @@ module Flux::LineProtocol
       end
     end
 
-    point.timestamp.try &.to_s " %s%N", io
+    point.timestamp.try &.to_s(io, " %s%N")
 
     io
   end

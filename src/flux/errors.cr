@@ -22,11 +22,9 @@ module Flux
     end
 
     def self.message_from(response : HTTP::Client::Response) : String
-      begin
-        JSON.parse(response.body || response.body_io)["message"].as_s
-      rescue
-        response.status_message || "HTTP #{response.status_code})"
-      end
+      JSON.parse(response.body || response.body_io)["message"].as_s
+    rescue
+      response.status_message || "HTTP #{response.status_code})"
     end
   end
 

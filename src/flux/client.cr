@@ -45,7 +45,7 @@ class Flux::Client
   # Perform a synchronous write of a set of *points* to the passed *bucket*.
   def write(bucket : String, points : Enumerable(Point))
     write_internal bucket do |io|
-      points.join '\n', io
+      points.join io, '\n'
     end
   end
 
