@@ -1,12 +1,13 @@
 require "http/client"
-require "logger"
+require "log"
 require "uri"
+
 require "./errors"
 require "./point"
 require "./query_result"
 
 class Flux::Client
-  getter log : Logger
+  Log = ::Log.for(self)
 
   # Creates a new InfluxDB client for the instance running at the specified
   # *url*.
@@ -14,8 +15,7 @@ class Flux::Client
   # *token* must be a valid API token on the instance that provides sufficient
   # privaleges for the buckets being interact with. Similarly *org* must match
   # the appropriate *org* name these buckets sit under.
-  def initialize(host, @token : String, @org : String, logger = nil)
-    @log = logger || Logger.new STDOUT, level: Logger::WARN
+  def initialize(host, @token : String, @org : String)
     @uri = URI.parse host
   end
 

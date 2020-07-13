@@ -1,4 +1,6 @@
+require "log"
 require "tasker"
+
 require "./client"
 require "./point"
 
@@ -81,20 +83,20 @@ class Flux::BufferedWriter
   # Error will be retried as appropriate.
   private def write(points : Enumerable(Point), retries = 3)
     client.write bucket, points
-    client.log.info "#{points.size} points written"
+    Log.info { "#{points.size} points written" }
   rescue ex : TooManyRequests
-    client.log.warn ex.message
+    Log.warn(exception: ex) { ex.message }
     sleep ex.retry_after
     write points
   rescue ex : ServerError
     retries -= 1
     if retries > 0
-      client.log.warn "#{ex.message}, retrying write request"
+      Log.warn { "#{ex.message}, retrying write request" }
       write points, retries
     else
-      client.log.error "#{ex.message}, retries exhausted - dropping write request"
+      Log.error { "#{ex.message}, retries exhausted - dropping write request" }
     end
   rescue ex : Error
-    client.log.error "#{ex.message}, dropping write request"
+    Log.error { "#{ex.message}, dropping write request" }
   end
 end

@@ -11,7 +11,6 @@ module Flux
     property bucket : String? = nil
     property batch_size : Int32 = 5000
     property flush_delay : Time::Span = 1.seconds
-    property logger : Logger? = nil
   end
 
   # Global client instance used by module level convinience wrappers.
@@ -33,7 +32,6 @@ module Flux
       host: config.host.not_nil!,
       token: config.api_key.not_nil!,
       org: config.org.not_nil!,
-      logger: config.logger
     )
 
     @@writer = Flux::BufferedWriter.new(
