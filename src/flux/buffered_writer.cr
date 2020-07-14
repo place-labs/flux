@@ -19,7 +19,9 @@ class Flux::BufferedWriter
 
   private getter schedule = Tasker.instance
 
-  private getter mutex = Mutex.new
+  private getter buffer_mutex = Mutex.new
+
+  private getter write_task_mutex = Mutex.new(protection: Mutex::Protection::Reentrant)
 
   private getter queue_length = 0
 
@@ -43,22 +45,26 @@ class Flux::BufferedWriter
   # Enqueue a *point* for writing.
   def enqueue(point : Point) : Nil
     buffer.send point
-    mutex.synchronize { @queue_length += 1 }
+    buffer_mutex.synchronize { @queue_length += 1 }
     flush
   end
 
   # Flush any fully buffered writes, or schedules a task for partials.
   def flush : Nil
     while queue_length >= batch_size
-      @write_task.try &.cancel
-      @write_task = nil
+      write_task_mutex.synchronize do
+        @write_task.try &.cancel
+        @write_task = nil
+      end
       dequeue batch_size
     end
 
     if queue_length > 0
-      @write_task ||= schedule.in(flush_delay) do
-        @write_task = nil
-        dequeue queue_length
+      write_task_mutex.synchronize do
+        @write_task ||= schedule.in(flush_delay) do
+          write_task_mutex.synchronize { @write_task = nil }
+          dequeue queue_length
+        end
       end
     end
   end
@@ -73,7 +79,7 @@ class Flux::BufferedWriter
       end
       read
     end
-    mutex.synchronize { @queue_length -= read }
+    buffer_mutex.synchronize { @queue_length -= read }
     writer.send points
     points
   end
