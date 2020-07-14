@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Crystal Ameba Linter
-      uses: crystal-ameba/github-action@v0.2.0
+      uses: crystal-ameba/github-action@v0.2.4
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Install dependencies
