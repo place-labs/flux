@@ -5,6 +5,8 @@ require "./client"
 require "./point"
 
 class Flux::BufferedWriter
+  Log = ::Log.for(self)
+
   private getter client : Flux::Client
 
   private getter bucket : String
