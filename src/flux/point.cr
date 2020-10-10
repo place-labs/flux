@@ -6,11 +6,11 @@ require "./line_protocol"
 # this causes issues elsewhere as you can not have an `Array`, `Channel` etc of
 # a generic type.
 struct Flux::Point
-  alias TagSet = Hash(Symbol, String)
+  alias TagSet = Hash(Symbol | String, String)
 
   alias FieldType = Float64 | Int64 | UInt64 | String | Bool
 
-  alias FieldSet = Hash(Symbol, FieldType)
+  alias FieldSet = Hash(Symbol | String, FieldType)
 
   getter measurement : String
 
