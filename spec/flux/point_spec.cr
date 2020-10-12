@@ -5,10 +5,10 @@ describe Flux::Point do
     it "maps fields into a FieldSet" do
       point = Flux::Point.new "foo", a: 1_u64, b: "test", c: 0.0, d: false
       point.fields.should eq({
-        :a => 1_u64,
-        :b => "test",
-        :c => 0.0,
-        :d => false,
+        "a" => 1_u64,
+        "b" => "test",
+        "c" => 0.0,
+        "d" => false,
       })
     end
   end
@@ -17,8 +17,8 @@ describe Flux::Point do
     it "maps fields into a FieldSet, discarding those with nil values" do
       point = Flux::Point.new! "foo", a: 1_u64, b: "test", c: nil, d: nil
       point.fields.should eq({
-        :a => 1_u64,
-        :b => "test",
+        "a" => 1_u64,
+        "b" => "test",
       })
     end
   end
@@ -27,7 +27,7 @@ describe Flux::Point do
     it "allows tagging of points" do
       point = Flux::Point.new "foo", a: 1_u64
       point.tag test: "bar"
-      point.tags.should eq({:test => "bar"})
+      point.tags.should eq({"test" => "bar"})
     end
   end
 
