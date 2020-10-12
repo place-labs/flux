@@ -6,11 +6,11 @@ require "./line_protocol"
 # this causes issues elsewhere as you can not have an `Array`, `Channel` etc of
 # a generic type.
 struct Flux::Point
-  alias TagSet = Hash(Symbol | String, String)
+  alias TagSet = Hash(String, String)
 
   alias FieldType = Float64 | Int64 | UInt64 | String | Bool
 
-  alias FieldSet = Hash(Symbol | String, FieldType)
+  alias FieldSet = Hash(String, FieldType)
 
   getter measurement : String
 
@@ -29,7 +29,7 @@ struct Flux::Point
       {% unless type < FieldType %}
         {% raise "invalid type for '#{key}' (#{type}) - fields must be #{FieldType}" %}
       {% end %}
-      fieldset[{{key.symbolize}}] = fields[{{key.symbolize}}]
+      fieldset[{{key.stringify}}] = fields[{{key.stringify}}]
     {% end %}
 
     new measurement, fieldset, timestamp, tags
@@ -44,8 +44,8 @@ struct Flux::Point
       {% unless type < FieldType? %}
         {% raise "invalid type for '#{key}' (#{type}) - fields must be #{FieldType?}" %}
       {% end %}
-      fieldset[{{key.symbolize}}] = fields[{{key.symbolize}}].not_nil! \
-        unless fields[{{key.symbolize}}].nil?
+      fieldset[{{key.stringify}}] = fields[{{key.stringify}}].not_nil! \
+        unless fields[{{key.stringify}}].nil?
     {% end %}
 
     new measurement, fieldset, timestamp, tags
@@ -57,7 +57,7 @@ struct Flux::Point
   # Append or change tags associated with the point.
   def tag(**tags : **T) forall T
     {% for key in T %}
-      self.tags[{{key.symbolize}}] = tags[{{key.symbolize}}]
+      self.tags[{{key.stringify}}] = tags[{{key.stringify}}]
     {% end %}
   end
 
