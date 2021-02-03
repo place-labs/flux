@@ -8,6 +8,9 @@ require "./query_result"
 
 class Flux::Client
   Log = ::Log.for(self)
+  {% begin %}
+  	alias Params = {{HTTP::Params.resolve? ? HTTP : URI}}::Params
+  {% end %}
 
   # Creates a new InfluxDB client for the instance running at the specified
   # *url*.
@@ -62,7 +65,7 @@ class Flux::Client
   # Write a set of data points to *bucket* on the connected instance.
   # TODO: check influx support for chunked transfer encoding
   private def write_internal(bucket : String, data : IO)
-    params = HTTP::Params.build do |param|
+    params = Params.build do |param|
       param.add "bucket", bucket
     end
 
