@@ -1,6 +1,7 @@
 require "http/client"
 require "log"
 require "uri"
+require "db/pool"
 
 require "./errors"
 require "./point"
@@ -17,18 +18,15 @@ class Flux::Client
   # the appropriate *org* name these buckets sit under.
   def initialize(host, @token : String, @org : String)
     @uri = URI.parse host
-  end
-
-  # Creates a new `HTTP::Client` for executing a request.
-  # OPTIMIZE: use a resource pool to enable client re-use.
-  private def connection
-    connection = HTTP::Client.new @uri
-    connection.before_request do |req|
-      req.headers["Authorization"] = "Token #{@token}"
-      req.path = "/api/v2#{req.path}"
-      req.query_params["org"] = @org
+    @connection_pool = DB::Pool(HTTP::Client).new(max_idle_pool_size: 10) do
+      connection = HTTP::Client.new(@uri)
+      connection.before_request do |req|
+        req.headers["Authorization"] = "Token #{@token}"
+        req.path = "/api/v2#{req.path}"
+        req.query_params["org"] = @org
+      end
+      connection
     end
-    connection
   end
 
   # Perform a synchronous write of a single *point* to the passed *bucket*.
@@ -69,7 +67,9 @@ class Flux::Client
     request = HTTP::Request.new "POST", "/write?#{params}", body: data
     request.content_length = data.size
 
-    response = connection.exec request
+    response = @connection_pool.checkout do |connection|
+      connection.exec request
+    end
     check_response! response
 
     nil
@@ -106,9 +106,11 @@ class Flux::Client
       dialect: AnnotatedCSV::DIALECT,
     }.to_json
 
-    connection.post "/query", headers, body do |response|
-      check_response! response
-      yield response.body_io
+    @connection_pool.checkout do |connection|
+      connection.post "/query", headers, body do |response|
+        check_response! response
+        yield response.body_io
+      end
     end
   end
 
