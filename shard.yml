@@ -11,6 +11,9 @@ dependencies:
   tasker:
     github: spider-gazelle/tasker
     version: ~> 1.3
+  db:
+    github: crystal-lang/crystal-db
+    version: ~> 0.10.0
 
 development_dependencies:
   ameba:
