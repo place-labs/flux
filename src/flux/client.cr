@@ -9,7 +9,7 @@ require "./query_result"
 class Flux::Client
   Log = ::Log.for(self)
   {% begin %}
-  	alias Params = {{HTTP::Params.resolve? ? HTTP : URI}}::Params
+    alias Params = {{HTTP::Params.resolve? ? HTTP : URI}}::Params
   {% end %}
 
   # Creates a new InfluxDB client for the instance running at the specified
