@@ -5,7 +5,7 @@ module Flux
   VERSION = `shards version`
 
   class Options
-    property host : String? = nil
+    property uri : String? = nil
     property api_key : String? = nil
     property org : String? = nil
     property bucket : String? = nil
@@ -25,11 +25,10 @@ module Flux
     @@client = nil
     @@writer = nil
 
-    config = Options.new
-    yield config
+    yield (config = Options.new)
 
     @@client = Flux::Client.new(
-      host: config.host.not_nil!,
+      uri: config.uri.not_nil!,
       token: config.api_key.not_nil!,
       org: config.org.not_nil!,
     )
@@ -41,7 +40,7 @@ module Flux
       flush_delay: config.flush_delay
     )
   rescue NilAssertionError
-    raise "Incomplete configuration - host, token, org and bucket must be specified"
+    raise "Incomplete configuration - uri, token, org and bucket must be specified"
   end
 
   private def self.client
