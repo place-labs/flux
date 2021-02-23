@@ -26,7 +26,7 @@ describe Flux do
     context "following global config" do
       it "writes single points" do
         Flux.configure do |settings|
-          settings.host = "http://example.com"
+          settings.uri = "http://example.com"
           settings.api_key = "abc"
           settings.org = "foo"
           settings.bucket = "test"
