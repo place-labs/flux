@@ -28,12 +28,14 @@ with appriopriate setters.
 
 ```crystal
 Flux.configure do |settings|
-  settings.uri     = ENV["INFLUX_URI"]? || abort "INFLUX_URI env var not set"
+  settings.uri     = ENV["INFLUX_HOST"]? || abort "INFLUX_HOST env var not set"
   settings.api_key = ENV["INFLUX_API_KEY"]? || abort "INFLUX_API_KEY env var not set"
   settings.org     = ENV["INFLUX_ORG"]? || "vandelay-industries"
   settings.bucket  = ENV["INFLUX_BUCKET"]? || "latex-sales"
 end
 ```
+
+**NOTE**: `INFLUX_HOST` is expected to be a well-formed URI.
 
 ### Writing data
 
