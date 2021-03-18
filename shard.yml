@@ -1,5 +1,5 @@
 name: flux
-version: 2.0.0
+version: 2.0.1
 crystal: ~> 0.34
 license: MIT
 
@@ -10,7 +10,7 @@ authors:
 dependencies:
   tasker:
     github: spider-gazelle/tasker
-    version: ~> 1.3
+    version: ~> 2
 
 development_dependencies:
   ameba:
