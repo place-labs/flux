@@ -10,7 +10,7 @@ authors:
 dependencies:
   tasker:
     github: spider-gazelle/tasker
-    version: ~> 1.3
+    version: ~> 2
 
 development_dependencies:
   ameba:
