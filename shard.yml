@@ -1,6 +1,6 @@
 name: flux
 version: 2.0.1
-crystal: ~> 0.34
+crystal: ">=0.34, < 2"
 license: MIT
 
 authors:
