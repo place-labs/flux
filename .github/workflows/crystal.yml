@@ -4,8 +4,16 @@ on: [push]
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
+    strategy: 
+      fail-fast: false
+      matrix:
+        include:
+          - {os: ubuntu-latest, crystal: latest}
+          - {os: ubuntu-latest, crystal: nightly}
+          - {os: ubuntu-latest, crystal: 0.36.0}
+          - {os: ubuntu-latest, crystal: 0.34.0}
+          - {os: ubuntu-latest, crystal: 1.0.0}
+    runs-on: ${{matrix.os}}
 
     container:
       image: crystallang/crystal
@@ -13,7 +21,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Crystal Ameba Linter
-      uses: crystal-ameba/github-action@v0.2.4
+      uses: crystal-ameba/github-action@v0.2.12
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Install dependencies
