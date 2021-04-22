@@ -22,9 +22,9 @@ jobs:
       image: crystallang/crystal
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v1
     - name: Crystal Ameba Linter
-      uses: crystal-ameba/github-action@v0.2.4
+      uses: crystal-ameba/github-action@v0.2.12
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Install dependencies
