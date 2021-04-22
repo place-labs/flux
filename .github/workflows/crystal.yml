@@ -22,7 +22,7 @@ jobs:
       image: crystallang/crystal
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Crystal Ameba Linter
       uses: crystal-ameba/github-action@v0.2.4
       env:
