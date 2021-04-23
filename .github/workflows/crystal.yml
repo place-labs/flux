@@ -22,8 +22,8 @@ jobs:
     # - uses: actions/checkout@v1
 
     - uses: oprypin/install-crystal@v1
-        with:
-          crystal: ${{matrix.crystal}}
+      with:
+        crystal: ${{matrix.crystal}}
     - name: Crystal Ameba Linter
       uses: crystal-ameba/github-action@v0.2.12
       env:
