@@ -28,7 +28,10 @@ jobs:
       uses: crystal-ameba/github-action@v0.2.12
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - uses: actions/checkout@v2
     - name: Install dependencies
       run: shards install
     - name: Run tests
       run: crystal spec
+    - run: crystal tool format && git diff --exit-code
+      if: matrix.crystal == 'latest'
