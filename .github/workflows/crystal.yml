@@ -8,7 +8,7 @@ jobs:
       fail-fast: false
       matrix:
         crystal: [latest, nightly, 0.34, 0.35, 0.36]
-    runs-on: ${{matrix.os}}
+    runs-on: ubuntu-latest
 
     steps:
     - uses: oprypin/install-crystal@v1
