@@ -15,11 +15,15 @@ jobs:
           - {os: ubuntu-latest, crystal: 1.0.0}
     runs-on: ${{matrix.os}}
 
-    container:
-      image: crystallang/crystal
+    # container:
+    #   image: crystallang/crystal
 
     steps:
-    - uses: actions/checkout@v1
+    # - uses: actions/checkout@v1
+
+    - uses: oprypin/install-crystal@v1
+        with:
+          crystal: ${{matrix.crystal}}
     - name: Crystal Ameba Linter
       uses: crystal-ameba/github-action@v0.2.12
       env:
