@@ -15,12 +15,7 @@ jobs:
           - {os: ubuntu-latest, crystal: 1.0.0}
     runs-on: ${{matrix.os}}
 
-    # container:
-    #   image: crystallang/crystal
-
     steps:
-    # - uses: actions/checkout@v1
-
     - uses: oprypin/install-crystal@v1
       with:
         crystal: ${{matrix.crystal}}
