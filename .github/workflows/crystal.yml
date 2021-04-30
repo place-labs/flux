@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: oprypin/install-crystal@v1
+    - uses: oprypin/install-crystal
       with:
         crystal: ${{matrix.crystal}}
     - name: Crystal Ameba Linter
