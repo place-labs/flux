@@ -4,19 +4,24 @@ on: [push]
 
 jobs:
   build:
-
+    strategy: 
+      fail-fast: false
+      matrix:
+        crystal: [latest, nightly, 1.0.0, 0.36.0]
     runs-on: ubuntu-latest
 
-    container:
-      image: crystallang/crystal
-
     steps:
-    - uses: actions/checkout@v1
+    - uses: oprypin/install-crystal@v1
+      with:
+        crystal: ${{matrix.crystal}}
+    - uses: actions/checkout@v2
     - name: Crystal Ameba Linter
-      uses: crystal-ameba/github-action@v0.2.4
+      uses: crystal-ameba/github-action@v0.2.12
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Install dependencies
       run: shards install
     - name: Run tests
       run: crystal spec
+    - run: crystal tool format && git diff --exit-code
+      if: matrix.crystal == 'latest'
