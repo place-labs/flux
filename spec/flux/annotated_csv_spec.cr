@@ -15,7 +15,7 @@ describe Flux::AnnotatedCSV do
     CSV
   csv = Flux::AnnotatedCSV.new io, headers: true
 
-  it "provides extractions from the base CSV class" do
+  it "provides extractions from the base CSV class", focus: true do
     csv.headers.should eq(["", "result", "table", "_start", "_stop", "_time",
                            "region", "host", "_value"])
   end

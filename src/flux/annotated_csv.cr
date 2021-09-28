@@ -22,7 +22,14 @@ class Flux::AnnotatedCSV < CSV
   def initialize(string_or_io : String | IO, headers = false, @strip = false, separator : Char = DEFAULT_SEPARATOR, quote_char : Char = DEFAULT_QUOTE_CHAR)
     @parser = Parser.new(string_or_io, separator, quote_char)
 
-    while @parser.peek == ANNOTATION_CHAR && (cols = @parser.next_row)
+    loop do
+      peeked_char = @parser.peek
+      puts "peeking: #{peeked_char}"
+      break unless peeked_char == ANNOTATION_CHAR
+      cols = @parser.next_row
+      puts "found cols: #{cols}"
+      break unless cols
+
       type = cols[0].lchop ANNOTATION_CHAR
       if annotations = @annotations
         annotations.zip(cols) { |col, value| col[type] = value }
