@@ -21,30 +21,28 @@ class Flux::AnnotatedCSV < CSV
 
   def initialize(string_or_io : String | IO, headers = false, @strip = false, separator : Char = DEFAULT_SEPARATOR, quote_char : Char = DEFAULT_QUOTE_CHAR)
     @parser = Parser.new(string_or_io, separator, quote_char)
-
-    loop do
-      peeked_char = @parser.peek
-      puts "peeking: #{peeked_char}"
-      break unless peeked_char == ANNOTATION_CHAR
-      cols = @parser.next_row
-      puts "found cols: #{cols}"
-      break unless cols
-
+    cols = @parser.next_row || ([] of String)
+    count = 0
+    while cols[0][0]? == ANNOTATION_CHAR
+      count += 1
       type = cols[0].lchop ANNOTATION_CHAR
       if annotations = @annotations
         annotations.zip(cols) { |col, value| col[type] = value }
       else
         @annotations = cols.map { |value| {type => value} }
       end
+      cols = @parser.next_row || ([] of String)
     end
 
     if headers
-      headers = @parser.next_row || ([] of String)
-      headers = @headers = headers.map &.strip
+      headers = @headers = cols.map &.strip
       indices = @indices = {} of String => Int32
       headers.each_with_index do |header, index|
         indices[header] ||= index
       end
+    else
+      @parser.rewind
+      count.times { @parser.next_row }
     end
 
     @traversed = false
