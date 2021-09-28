@@ -10,7 +10,7 @@ struct Flux::QueryResult::Table(T)
   def initialize(@columns)
   end
 
-  delegate each, :<<, unsafe_fetch, to: records
+  delegate each, :<<, unsafe_fetch, size, to: records
 
   def group_key
     columns.select(&.group).map(&.name)
