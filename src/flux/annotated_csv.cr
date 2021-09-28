@@ -23,7 +23,7 @@ class Flux::AnnotatedCSV < CSV
     @parser = Parser.new(string_or_io, separator, quote_char)
     cols = @parser.next_row || ([] of String)
     count = 0
-    while cols[0]?.try(&.[]?(0)) == ANNOTATION_CHAR
+    while cols.first?.try(&.first?) == ANNOTATION_CHAR
       count += 1
       type = cols[0].lchop ANNOTATION_CHAR
       if annotations = @annotations
