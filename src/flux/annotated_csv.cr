@@ -21,23 +21,29 @@ class Flux::AnnotatedCSV < CSV
 
   def initialize(string_or_io : String | IO, headers = false, @strip = false, separator : Char = DEFAULT_SEPARATOR, quote_char : Char = DEFAULT_QUOTE_CHAR)
     @parser = Parser.new(string_or_io, separator, quote_char)
-
-    while @parser.peek == ANNOTATION_CHAR && (cols = @parser.next_row)
+    cols = @parser.next_row || ([] of String)
+    count = 0
+    while cols.first?.try &.starts_with?(ANNOTATION_CHAR)
+      count += 1
       type = cols[0].lchop ANNOTATION_CHAR
       if annotations = @annotations
         annotations.zip(cols) { |col, value| col[type] = value }
       else
         @annotations = cols.map { |value| {type => value} }
       end
+      cols = @parser.next_row || ([] of String)
     end
 
     if headers
-      headers = @parser.next_row || ([] of String)
-      headers = @headers = headers.map &.strip
+      headers = @headers = cols.map &.strip
       indices = @indices = {} of String => Int32
       headers.each_with_index do |header, index|
         indices[header] ||= index
       end
+    else
+      # we are one row ahead of where we should be so need to rewind
+      @parser.rewind
+      count.times { @parser.next_row }
     end
 
     @traversed = false
@@ -52,17 +58,5 @@ class Flux::AnnotatedCSV < CSV
   def annotations(header : String)
     index = indices[header]
     annotations[index]
-  end
-end
-
-class CSV::Parser
-  protected def peek
-    @lexer.peek
-  end
-end
-
-abstract class CSV::Lexer
-  protected def peek
-    current_char
   end
 end
