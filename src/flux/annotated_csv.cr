@@ -41,6 +41,7 @@ class Flux::AnnotatedCSV < CSV
         indices[header] ||= index
       end
     else
+      # we are one row ahead of where we should be so need to rewind
       @parser.rewind
       count.times { @parser.next_row }
     end
@@ -57,17 +58,5 @@ class Flux::AnnotatedCSV < CSV
   def annotations(header : String)
     index = indices[header]
     annotations[index]
-  end
-end
-
-class CSV::Parser
-  protected def peek
-    @lexer.peek
-  end
-end
-
-abstract class CSV::Lexer
-  protected def peek
-    current_char
   end
 end
