@@ -94,7 +94,7 @@ class Flux::BufferedWriter
     Log.info { "#{points.size} points written" }
   rescue ex : TooManyRequests
     Log.warn(exception: ex) { ex.message }
-    sleep ex.retry_after
+    sleep ex.retry_after.seconds
     write points
   rescue ex : ServerError
     retries -= 1

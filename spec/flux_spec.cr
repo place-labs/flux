@@ -45,7 +45,7 @@ describe Flux do
             body: points.first.to_s
           )
         Flux.write points.first
-        sleep 0.1
+        sleep 100.milliseconds
       end
 
       it "writes multiple points as a single request" do
@@ -61,7 +61,7 @@ describe Flux do
             body: points.join '\n'
           )
         points.each &->Flux.write(Flux::Point)
-        sleep 0.1
+        sleep 100.milliseconds
       end
     end
   end
