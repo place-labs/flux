@@ -27,13 +27,13 @@ describe Flux::BufferedWriter do
     it "writes single points" do
       build_mock.call points[0, 1]
       writer.enqueue points.first
-      sleep 0.1
+      sleep 100.milliseconds
     end
 
     it "writes multiple points as a single request" do
       points.each_slice 5, &build_mock
       points.each &->writer.enqueue(Flux::Point)
-      sleep 0.3
+      sleep 300.milliseconds
     end
   end
 end

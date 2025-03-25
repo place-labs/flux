@@ -21,7 +21,7 @@ module Flux
 
   # Sets the root config used by `Flux.write` and `Flux.query` and create a
   # global client based on this.
-  def self.configure : Nil
+  def self.configure(&) : Nil
     @@client = nil
     @@writer = nil
 

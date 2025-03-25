@@ -18,21 +18,24 @@ class Flux::Client
   # *token* must be a valid API token on the instance that provides sufficient
   # privaleges for the buckets being interact with. Similarly *org* must match
   # the appropriate *org* name these buckets sit under.
-  def initialize(uri : String, @token : String, @org : String)
-    @uri = URI.parse uri
-    raise "Malformed URI" unless {@uri.host, @uri.scheme}.all? &.presence
+  def initialize(uri : String, token : String, org : String)
+    url = URI.parse uri
+    raise "Malformed URI" unless {url.host, url.scheme}.all? &.presence
+    @client_lock = Mutex.new
+    @client = HTTP::Client.new(url)
+    @client.before_request do |req|
+      req.headers["Authorization"] = "Token #{token}"
+      req.path = "/api/v2#{req.path}"
+      req.query_params["org"] = org
+    end
   end
 
   # Creates a new `HTTP::Client` for executing a request.
   # OPTIMIZE: use a resource pool to enable client re-use.
-  private def connection
-    connection = HTTP::Client.new @uri
-    connection.before_request do |req|
-      req.headers["Authorization"] = "Token #{@token}"
-      req.path = "/api/v2#{req.path}"
-      req.query_params["org"] = @org
+  private def connection(&)
+    @client_lock.synchronize do
+      with @client yield @client
     end
-    connection
   end
 
   # Perform a synchronous write of a single *point* to the passed *bucket*.
@@ -56,7 +59,7 @@ class Flux::Client
   # Write a set of data points to *bucket* on the connected instance.
   #
   # Yields an IO. Points to be written should be appended to this.
-  private def write_internal(bucket : String, &block : IO -> _)
+  private def write_internal(bucket : String, & : IO -> _)
     buf = IO::Memory.new
     yield buf
     buf.rewind
@@ -73,7 +76,7 @@ class Flux::Client
     request = HTTP::Request.new "POST", "/write?#{params}", body: data
     request.content_length = data.size
 
-    response = connection.exec request
+    response = connection { exec(request) }
     check_response! response
 
     nil
@@ -100,7 +103,7 @@ class Flux::Client
   end
 
   # Runs a query on the connected InfluxDB instance, returning the result.
-  private def query_internal(expression : String, &block : IO -> T) : T forall T
+  private def query_internal(expression : String, & : IO -> T) : T forall T
     headers = HTTP::Headers.new
     headers.add "Accept", "application/csv"
     headers.add "Content-Type", "application/json"
@@ -110,9 +113,11 @@ class Flux::Client
       dialect: AnnotatedCSV::DIALECT,
     }.to_json
 
-    connection.post "/query", headers, body do |response|
-      check_response! response
-      yield response.body_io
+    connection do |conn|
+      conn.post "/query", headers, body do |response|
+        check_response! response
+        yield response.body_io
+      end
     end
   end
 

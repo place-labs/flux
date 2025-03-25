@@ -3,25 +3,22 @@ name: Crystal CI
 on: [push]
 
 jobs:
-  build:
-    strategy: 
-      fail-fast: false
-      matrix:
-        crystal: [latest, nightly, 1.0.0, 0.36.0]
+  test:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: oprypin/install-crystal@v1
-      with:
-        crystal: ${{matrix.crystal}}
-    - uses: actions/checkout@v2
-    - name: Crystal Ameba Linter
-      uses: crystal-ameba/github-action@v0.2.12
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Install dependencies
-      run: shards install
-    - name: Run tests
-      run: crystal spec
-    - run: crystal tool format && git diff --exit-code
-      if: matrix.crystal == 'latest'
+      - name: Download source
+        uses: actions/checkout@v4
+      - name: Install Crystal
+        uses: crystal-lang/install-crystal@v1
+      - name: Cache shards
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/shards
+          key: ${{ runner.os }}-shards-${{ hashFiles('shard.yml') }}
+          restore-keys: ${{ runner.os }}-shards-
+      - name: Install shards
+        run: shards update
+      - name: Run tests
+        run: crystal spec
+      - name: Check formatting
+        run: crystal tool format --check
